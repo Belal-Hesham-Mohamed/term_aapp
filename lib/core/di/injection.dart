@@ -14,7 +14,6 @@ Future<void> setup() async {
       await helper.init();
       return helper;
     },
-    preResolve: true,
   );
 
   // Register the raw Database instance, depending on DatabaseHelper.
@@ -22,4 +21,6 @@ Future<void> setup() async {
     () => getIt<DatabaseHelper>().db,
     dependsOn: [DatabaseHelper],
   );
+
+  await getIt.allReady();
 }

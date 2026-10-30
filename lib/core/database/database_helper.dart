@@ -21,6 +21,7 @@ class DatabaseHelper {
     _db = await openDatabase(
       path,
       version: _dbVersion,
+      onConfigure: (db) async => await db.execute('PRAGMA foreign_keys = ON'),
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -36,6 +37,7 @@ class DatabaseHelper {
     _db = await openDatabase(
       inMemoryDatabasePath,
       version: _dbVersion,
+      onConfigure: (db) async => await db.execute('PRAGMA foreign_keys = ON'),
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
