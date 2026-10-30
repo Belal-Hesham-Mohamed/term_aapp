@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS group_students (
   student_id INTEGER NOT NULL,
   enrolled_at INTEGER NOT NULL,
   PRIMARY KEY (group_id, student_id),
-  FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE RESTRICT,
+  FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE RESTRICT
 );
 ''';
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS lessons (
   is_canceled INTEGER NOT NULL DEFAULT 0,
   cancellation_reason TEXT,
   UNIQUE (group_id, scheduled_date, start_time),
-  FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE RESTRICT
+  FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
 );
 ''';
 
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS attendance_records (
   status TEXT NOT NULL,
   recorded_at INTEGER NOT NULL,
   UNIQUE (lesson_id, student_id),
-  FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE RESTRICT,
+  FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE,
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE RESTRICT
 );
 ''';
