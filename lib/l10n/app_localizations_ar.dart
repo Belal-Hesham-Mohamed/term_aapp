@@ -82,4 +82,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get saving => 'جارٍ الحفظ...';
+
+  @override
+  String get saveFailed => 'تعذر حفظ بيانات الطالب. تغييراتك ما زالت موجودة، حاول مرة أخرى.';
+
+  @override
+  String get invalidAge => 'أدخل عمراً صحيحاً غير سالب.';
 }

@@ -247,6 +247,8 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saving...'**
   String get saving;
+  String get saveFailed;
+  String get invalidAge;
 }
 
 class _AppLocalizationsDelegate

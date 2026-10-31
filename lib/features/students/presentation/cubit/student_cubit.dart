@@ -1,5 +1,7 @@
 // lib/features/students/presentation/cubit/student_cubit.dart
 
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../state/student_state.dart';
 import '../../domain/repositories/student_repository.dart';
@@ -7,28 +9,49 @@ import '../../domain/entities/student.dart';
 
 class StudentCubit extends Cubit<StudentState> {
   final StudentRepository repository;
+  Timer? _searchTimer;
+  String _query = '';
+  int _requestId = 0;
 
   StudentCubit(this.repository) : super(StudentLoading()) {
     loadStudents();
   }
 
   Future<void> loadStudents() async {
+    final requestId = ++_requestId;
+    final query = _query;
     try {
-      emit(StudentLoading());
-      final students = await repository.getActiveStudents();
-      emit(StudentLoaded(students));
+      final students = query.isEmpty
+          ? await repository.getActiveStudents()
+          : await repository.searchStudents(query);
+      if (!isClosed && requestId == _requestId) emit(StudentLoaded(students));
     } catch (e) {
-      emit(StudentError(e.toString()));
+      if (!isClosed && requestId == _requestId) emit(StudentError(e.toString()));
     }
   }
 
   Future<void> searchStudents(String query) async {
+    _query = query.trim();
+    _searchTimer?.cancel();
+    final requestId = ++_requestId;
+    if (_query.isEmpty) {
+      await _loadForQuery(requestId, '');
+      return;
+    }
+    final queryToSearch = _query;
+    _searchTimer = Timer(const Duration(milliseconds: 300), () {
+      _loadForQuery(requestId, queryToSearch);
+    });
+  }
+
+  Future<void> _loadForQuery(int requestId, String query) async {
     try {
-      emit(StudentLoading());
-      final students = await repository.searchStudents(query);
-      emit(StudentLoaded(students));
+      final students = query.isEmpty
+          ? await repository.getActiveStudents()
+          : await repository.searchStudents(query);
+      if (!isClosed && requestId == _requestId) emit(StudentLoaded(students));
     } catch (e) {
-      emit(StudentError(e.toString()));
+      if (!isClosed && requestId == _requestId) emit(StudentError(e.toString()));
     }
   }
 
@@ -83,5 +106,11 @@ class StudentCubit extends Cubit<StudentState> {
       emit(StudentError(e.toString()));
       return false;
     }
+  }
+
+  @override
+  Future<void> close() {
+    _searchTimer?.cancel();
+    return super.close();
   }
 }

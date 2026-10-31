@@ -24,6 +24,8 @@
   "search": "Search",
   "searchHint": "Search by name or phone",
   "noResults": "No results",
-  "saving": "Saving..."
+  "saving": "Saving...",
+  "saveFailed": "Could not save the student. Your changes are still here; please try again.",
+  "invalidAge": "Enter a valid non-negative age."
 }
 

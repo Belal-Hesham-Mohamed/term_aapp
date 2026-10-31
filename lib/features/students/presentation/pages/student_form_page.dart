@@ -23,6 +23,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
   late final TextEditingController _guardianController;
   late final TextEditingController _notesController;
   bool _saving = false;
+  String? _saveError;
 
   bool get isEdit => widget.student != null;
 
@@ -50,8 +51,10 @@ class _StudentFormPageState extends State<StudentFormPage> {
   }
 
   Future<void> _save() async {
+    if (_saving) return;
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _saving = true);
+    setState(() { _saving = true; _saveError = null; });
     final cubit = getIt<StudentCubit>();
     bool success = false;
     if (isEdit && widget.student != null) {
@@ -77,7 +80,10 @@ class _StudentFormPageState extends State<StudentFormPage> {
       );
     }
     if (mounted) {
-      setState(() => _saving = false);
+      setState(() {
+        _saving = false;
+        if (!success) _saveError = l10n.saveFailed;
+      });
       if (success) {
         Navigator.pop(context, true);
       }
@@ -121,6 +127,12 @@ class _StudentFormPageState extends State<StudentFormPage> {
                   controller: _ageController,
                   decoration: InputDecoration(labelText: l10n.age),
                   keyboardType: TextInputType.number,
+                  validator: (value) {
+                    final text = value?.trim() ?? '';
+                    if (text.isEmpty) return null;
+                    final age = int.tryParse(text);
+                    return age == null || age < 0 ? l10n.invalidAge : null;
+                  },
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -135,6 +147,13 @@ class _StudentFormPageState extends State<StudentFormPage> {
                   maxLines: 3,
                 ),
                 const SizedBox(height: 24),
+                if (_saveError != null) ...[
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(_saveError!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

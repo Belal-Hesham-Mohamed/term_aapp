@@ -1,5 +1,7 @@
 // lib/features/students/domain/entities/student.dart
 
+const _notProvided = Object();
+
 class Student {
   final int id;
   final String name;
@@ -29,25 +31,25 @@ class Student {
     int? id,
     String? name,
     String? grade,
-    String? phone,
-    int? age,
-    String? guardianPhone,
-    String? notes,
+    Object? phone = _notProvided,
+    Object? age = _notProvided,
+    Object? guardianPhone = _notProvided,
+    Object? notes = _notProvided,
+    Object? archivedAt = _notProvided,
     int? createdAt,
     int? updatedAt,
-    int? archivedAt,
   }) {
     return Student(
       id: id ?? this.id,
       name: name ?? this.name,
       grade: grade ?? this.grade,
-      phone: phone ?? this.phone,
-      age: age ?? this.age,
-      guardianPhone: guardianPhone ?? this.guardianPhone,
-      notes: notes ?? this.notes,
+      phone: identical(phone, _notProvided) ? this.phone : phone as String?,
+      age: identical(age, _notProvided) ? this.age : age as int?,
+      guardianPhone: identical(guardianPhone, _notProvided) ? this.guardianPhone : guardianPhone as String?,
+      notes: identical(notes, _notProvided) ? this.notes : notes as String?,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      archivedAt: archivedAt ?? this.archivedAt,
+      archivedAt: identical(archivedAt, _notProvided) ? this.archivedAt : archivedAt as int?,
     );
   }
 
