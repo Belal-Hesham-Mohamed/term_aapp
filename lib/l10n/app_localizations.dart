@@ -367,6 +367,324 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No matching groups found.'**
   String get noGroupsFound;
+
+  /// No description provided for @groupSchedules.
+  ///
+  /// In en, this message translates to:
+  /// **'Group schedules'**
+  String get groupSchedules;
+
+  /// No description provided for @noSchedules.
+  ///
+  /// In en, this message translates to:
+  /// **'No schedules for this group.'**
+  String get noSchedules;
+
+  /// No description provided for @addSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Add schedule'**
+  String get addSchedule;
+
+  /// No description provided for @editSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit schedule'**
+  String get editSchedule;
+
+  /// No description provided for @removeSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove schedule'**
+  String get removeSchedule;
+
+  /// No description provided for @removeScheduleConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this schedule? Existing lessons will be kept.'**
+  String get removeScheduleConfirm;
+
+  /// No description provided for @weekday.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekday'**
+  String get weekday;
+
+  /// No description provided for @monday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get monday;
+
+  /// No description provided for @tuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get tuesday;
+
+  /// No description provided for @wednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get wednesday;
+
+  /// No description provided for @thursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get thursday;
+
+  /// No description provided for @friday.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get friday;
+
+  /// No description provided for @saturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get saturday;
+
+  /// No description provided for @sunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get sunday;
+
+  /// No description provided for @startTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Start time'**
+  String get startTime;
+
+  /// No description provided for @endTime.
+  ///
+  /// In en, this message translates to:
+  /// **'End time'**
+  String get endTime;
+
+  /// No description provided for @chooseTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a time'**
+  String get chooseTime;
+
+  /// No description provided for @scheduleActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active schedule'**
+  String get scheduleActive;
+
+  /// No description provided for @scheduleInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get scheduleInactive;
+
+  /// No description provided for @scheduleTimesRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose both a start and end time.'**
+  String get scheduleTimesRequired;
+
+  /// No description provided for @invalidTimeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'End time must be later than start time.'**
+  String get invalidTimeRange;
+
+  /// No description provided for @scheduleConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'This time overlaps another active schedule for this weekday.'**
+  String get scheduleConflict;
+
+  /// No description provided for @scheduleSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the schedule. Please try again.'**
+  String get scheduleSaveFailed;
+
+  /// No description provided for @scheduleLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load schedules. Please try again.'**
+  String get scheduleLoadFailed;
+
+  /// No description provided for @manage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage'**
+  String get manage;
+
+  /// No description provided for @groupLessons.
+  ///
+  /// In en, this message translates to:
+  /// **'Group lessons'**
+  String get groupLessons;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get viewAll;
+
+  /// No description provided for @createLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'Create lesson'**
+  String get createLesson;
+
+  /// No description provided for @editLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit lesson'**
+  String get editLesson;
+
+  /// No description provided for @lessonDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson details'**
+  String get lessonDetails;
+
+  /// No description provided for @group.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get group;
+
+  /// No description provided for @lessonDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson date'**
+  String get lessonDate;
+
+  /// No description provided for @lessonTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson time'**
+  String get lessonTime;
+
+  /// No description provided for @lessonStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get lessonStatus;
+
+  /// No description provided for @lessonScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get lessonScheduled;
+
+  /// No description provided for @lessonCanceled.
+  ///
+  /// In en, this message translates to:
+  /// **'Canceled'**
+  String get lessonCanceled;
+
+  /// No description provided for @cancellationReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation reason'**
+  String get cancellationReason;
+
+  /// No description provided for @duplicateLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'A lesson already exists for this group, date, and start time.'**
+  String get duplicateLesson;
+
+  /// No description provided for @invalidLessonTime.
+  ///
+  /// In en, this message translates to:
+  /// **'End time must be later than start time.'**
+  String get invalidLessonTime;
+
+  /// No description provided for @lessonFieldsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a group and both lesson times.'**
+  String get lessonFieldsRequired;
+
+  /// No description provided for @lessonSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the lesson. Your changes are still here; please try again.'**
+  String get lessonSaveFailed;
+
+  /// No description provided for @lessonLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load lessons. Please try again.'**
+  String get lessonLoadFailed;
+
+  /// No description provided for @noLessons.
+  ///
+  /// In en, this message translates to:
+  /// **'No lessons yet.'**
+  String get noLessons;
+
+  /// No description provided for @attendance.
+  ///
+  /// In en, this message translates to:
+  /// **'Attendance'**
+  String get attendance;
+
+  /// No description provided for @takeAttendance.
+  ///
+  /// In en, this message translates to:
+  /// **'Take attendance'**
+  String get takeAttendance;
+
+  /// No description provided for @present.
+  ///
+  /// In en, this message translates to:
+  /// **'Present'**
+  String get present;
+
+  /// No description provided for @absent.
+  ///
+  /// In en, this message translates to:
+  /// **'Absent'**
+  String get absent;
+
+  /// No description provided for @notMarked.
+  ///
+  /// In en, this message translates to:
+  /// **'Not marked'**
+  String get notMarked;
+
+  /// No description provided for @noAttendanceStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'No students are enrolled for this lesson.'**
+  String get noAttendanceStudents;
+
+  /// No description provided for @saveAttendance.
+  ///
+  /// In en, this message translates to:
+  /// **'Save attendance'**
+  String get saveAttendance;
+
+  /// No description provided for @attendanceSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Attendance saved.'**
+  String get attendanceSaved;
+
+  /// No description provided for @attendanceLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load attendance. Please try again.'**
+  String get attendanceLoadFailed;
+
+  /// No description provided for @attendanceSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save attendance. Your changes are still here; please try again.'**
+  String get attendanceSaveFailed;
 }
 
 class _AppLocalizationsDelegate

@@ -148,4 +148,168 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noGroupsFound => 'لم يتم العثور على مجموعات مطابقة.';
+
+  @override
+  String get groupSchedules => 'مواعيد المجموعة';
+
+  @override
+  String get noSchedules => 'لا توجد مواعيد لهذه المجموعة.';
+
+  @override
+  String get addSchedule => 'إضافة موعد';
+
+  @override
+  String get editSchedule => 'تعديل الموعد';
+
+  @override
+  String get removeSchedule => 'إزالة الموعد';
+
+  @override
+  String get removeScheduleConfirm =>
+      'هل تريد إزالة هذا الموعد؟ ستظل الدروس الحالية محفوظة.';
+
+  @override
+  String get weekday => 'اليوم';
+
+  @override
+  String get monday => 'الاثنين';
+
+  @override
+  String get tuesday => 'الثلاثاء';
+
+  @override
+  String get wednesday => 'الأربعاء';
+
+  @override
+  String get thursday => 'الخميس';
+
+  @override
+  String get friday => 'الجمعة';
+
+  @override
+  String get saturday => 'السبت';
+
+  @override
+  String get sunday => 'الأحد';
+
+  @override
+  String get startTime => 'وقت البدء';
+
+  @override
+  String get endTime => 'وقت الانتهاء';
+
+  @override
+  String get chooseTime => 'اختر الوقت';
+
+  @override
+  String get scheduleActive => 'موعد نشط';
+
+  @override
+  String get scheduleInactive => 'غير نشط';
+
+  @override
+  String get scheduleTimesRequired => 'اختر وقت البدء والانتهاء.';
+
+  @override
+  String get invalidTimeRange => 'يجب أن يكون وقت الانتهاء بعد وقت البدء.';
+
+  @override
+  String get scheduleConflict =>
+      'يتداخل هذا الوقت مع موعد نشط آخر في اليوم نفسه.';
+
+  @override
+  String get scheduleSaveFailed => 'تعذر حفظ الموعد. حاول مرة أخرى.';
+
+  @override
+  String get scheduleLoadFailed => 'تعذر تحميل المواعيد. حاول مرة أخرى.';
+
+  @override
+  String get manage => 'إدارة';
+
+  @override
+  String get groupLessons => 'دروس المجموعة';
+
+  @override
+  String get viewAll => 'عرض الكل';
+
+  @override
+  String get createLesson => 'إنشاء درس';
+
+  @override
+  String get editLesson => 'تعديل الدرس';
+
+  @override
+  String get lessonDetails => 'تفاصيل الدرس';
+
+  @override
+  String get group => 'المجموعة';
+
+  @override
+  String get lessonDate => 'تاريخ الدرس';
+
+  @override
+  String get lessonTime => 'وقت الدرس';
+
+  @override
+  String get lessonStatus => 'الحالة';
+
+  @override
+  String get lessonScheduled => 'مجدول';
+
+  @override
+  String get lessonCanceled => 'ملغى';
+
+  @override
+  String get cancellationReason => 'سبب الإلغاء';
+
+  @override
+  String get duplicateLesson =>
+      'يوجد درس لهذه المجموعة والتاريخ ووقت البدء بالفعل.';
+
+  @override
+  String get invalidLessonTime => 'يجب أن يكون وقت الانتهاء بعد وقت البدء.';
+
+  @override
+  String get lessonFieldsRequired => 'اختر المجموعة ووقت البدء والانتهاء.';
+
+  @override
+  String get lessonSaveFailed =>
+      'تعذر حفظ الدرس. تغييراتك ما زالت موجودة، حاول مرة أخرى.';
+
+  @override
+  String get lessonLoadFailed => 'تعذر تحميل الدروس. حاول مرة أخرى.';
+
+  @override
+  String get noLessons => 'لا توجد دروس بعد.';
+
+  @override
+  String get attendance => 'الحضور';
+
+  @override
+  String get takeAttendance => 'تسجيل الحضور';
+
+  @override
+  String get present => 'حاضر';
+
+  @override
+  String get absent => 'غائب';
+
+  @override
+  String get notMarked => 'غير محدد';
+
+  @override
+  String get noAttendanceStudents => 'لا يوجد طلاب مسجلون لهذا الدرس.';
+
+  @override
+  String get saveAttendance => 'حفظ الحضور';
+
+  @override
+  String get attendanceSaved => 'تم حفظ الحضور.';
+
+  @override
+  String get attendanceLoadFailed => 'تعذر تحميل الحضور. حاول مرة أخرى.';
+
+  @override
+  String get attendanceSaveFailed =>
+      'تعذر حفظ الحضور. تغييراتك ما زالت موجودة، حاول مرة أخرى.';
 }

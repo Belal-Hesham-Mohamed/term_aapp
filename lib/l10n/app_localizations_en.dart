@@ -148,4 +148,172 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noGroupsFound => 'No matching groups found.';
+
+  @override
+  String get groupSchedules => 'Group schedules';
+
+  @override
+  String get noSchedules => 'No schedules for this group.';
+
+  @override
+  String get addSchedule => 'Add schedule';
+
+  @override
+  String get editSchedule => 'Edit schedule';
+
+  @override
+  String get removeSchedule => 'Remove schedule';
+
+  @override
+  String get removeScheduleConfirm =>
+      'Remove this schedule? Existing lessons will be kept.';
+
+  @override
+  String get weekday => 'Weekday';
+
+  @override
+  String get monday => 'Monday';
+
+  @override
+  String get tuesday => 'Tuesday';
+
+  @override
+  String get wednesday => 'Wednesday';
+
+  @override
+  String get thursday => 'Thursday';
+
+  @override
+  String get friday => 'Friday';
+
+  @override
+  String get saturday => 'Saturday';
+
+  @override
+  String get sunday => 'Sunday';
+
+  @override
+  String get startTime => 'Start time';
+
+  @override
+  String get endTime => 'End time';
+
+  @override
+  String get chooseTime => 'Choose a time';
+
+  @override
+  String get scheduleActive => 'Active schedule';
+
+  @override
+  String get scheduleInactive => 'Inactive';
+
+  @override
+  String get scheduleTimesRequired => 'Choose both a start and end time.';
+
+  @override
+  String get invalidTimeRange => 'End time must be later than start time.';
+
+  @override
+  String get scheduleConflict =>
+      'This time overlaps another active schedule for this weekday.';
+
+  @override
+  String get scheduleSaveFailed =>
+      'Could not save the schedule. Please try again.';
+
+  @override
+  String get scheduleLoadFailed =>
+      'Could not load schedules. Please try again.';
+
+  @override
+  String get manage => 'Manage';
+
+  @override
+  String get groupLessons => 'Group lessons';
+
+  @override
+  String get viewAll => 'View all';
+
+  @override
+  String get createLesson => 'Create lesson';
+
+  @override
+  String get editLesson => 'Edit lesson';
+
+  @override
+  String get lessonDetails => 'Lesson details';
+
+  @override
+  String get group => 'Group';
+
+  @override
+  String get lessonDate => 'Lesson date';
+
+  @override
+  String get lessonTime => 'Lesson time';
+
+  @override
+  String get lessonStatus => 'Status';
+
+  @override
+  String get lessonScheduled => 'Scheduled';
+
+  @override
+  String get lessonCanceled => 'Canceled';
+
+  @override
+  String get cancellationReason => 'Cancellation reason';
+
+  @override
+  String get duplicateLesson =>
+      'A lesson already exists for this group, date, and start time.';
+
+  @override
+  String get invalidLessonTime => 'End time must be later than start time.';
+
+  @override
+  String get lessonFieldsRequired => 'Choose a group and both lesson times.';
+
+  @override
+  String get lessonSaveFailed =>
+      'Could not save the lesson. Your changes are still here; please try again.';
+
+  @override
+  String get lessonLoadFailed => 'Could not load lessons. Please try again.';
+
+  @override
+  String get noLessons => 'No lessons yet.';
+
+  @override
+  String get attendance => 'Attendance';
+
+  @override
+  String get takeAttendance => 'Take attendance';
+
+  @override
+  String get present => 'Present';
+
+  @override
+  String get absent => 'Absent';
+
+  @override
+  String get notMarked => 'Not marked';
+
+  @override
+  String get noAttendanceStudents =>
+      'No students are enrolled for this lesson.';
+
+  @override
+  String get saveAttendance => 'Save attendance';
+
+  @override
+  String get attendanceSaved => 'Attendance saved.';
+
+  @override
+  String get attendanceLoadFailed =>
+      'Could not load attendance. Please try again.';
+
+  @override
+  String get attendanceSaveFailed =>
+      'Could not save attendance. Your changes are still here; please try again.';
 }

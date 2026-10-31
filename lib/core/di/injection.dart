@@ -10,6 +10,18 @@ import '../../features/groups/data/datasources/group_local_datasource.dart';
 import '../../features/groups/data/repositories/group_repository_impl.dart';
 import '../../features/groups/domain/repositories/group_repository.dart';
 import '../../features/groups/presentation/cubit/group_cubit.dart';
+import '../../features/schedules/data/datasources/schedule_local_datasource.dart';
+import '../../features/schedules/data/repositories/schedule_repository_impl.dart';
+import '../../features/schedules/domain/repositories/schedule_repository.dart';
+import '../../features/schedules/presentation/cubit/schedule_cubit.dart';
+import '../../features/lessons/data/datasources/lesson_local_datasource.dart';
+import '../../features/lessons/data/repositories/lesson_repository_impl.dart';
+import '../../features/lessons/domain/repositories/lesson_repository.dart';
+import '../../features/lessons/presentation/cubit/lesson_cubit.dart';
+import '../../features/attendance/data/datasources/attendance_local_datasource.dart';
+import '../../features/attendance/data/repositories/attendance_repository_impl.dart';
+import '../../features/attendance/domain/repositories/attendance_repository.dart';
+import '../../features/attendance/presentation/cubit/attendance_cubit.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -48,6 +60,9 @@ Future<void> setup() async {
   );
 
   registerGroupDependencies(getIt);
+  registerScheduleDependencies(getIt);
+  registerLessonDependencies(getIt);
+  registerAttendanceDependencies(getIt);
 
   await getIt.allReady();
 }
@@ -61,5 +76,41 @@ void registerGroupDependencies(GetIt locator) {
   );
   locator.registerFactory<GroupCubit>(
     () => GroupCubit(locator<GroupRepository>()),
+  );
+}
+
+void registerScheduleDependencies(GetIt locator) {
+  locator.registerFactory<ScheduleLocalDataSource>(
+    () => ScheduleLocalDataSource(locator<DatabaseHelper>()),
+  );
+  locator.registerFactory<ScheduleRepository>(
+    () => ScheduleRepositoryImpl(locator<ScheduleLocalDataSource>()),
+  );
+  locator.registerFactory<ScheduleCubit>(
+    () => ScheduleCubit(locator<ScheduleRepository>()),
+  );
+}
+
+void registerLessonDependencies(GetIt locator) {
+  locator.registerFactory<LessonLocalDataSource>(
+    () => LessonLocalDataSource(locator<DatabaseHelper>()),
+  );
+  locator.registerFactory<LessonRepository>(
+    () => LessonRepositoryImpl(locator<LessonLocalDataSource>()),
+  );
+  locator.registerFactory<LessonCubit>(
+    () => LessonCubit(locator<LessonRepository>()),
+  );
+}
+
+void registerAttendanceDependencies(GetIt locator) {
+  locator.registerFactory<AttendanceLocalDataSource>(
+    () => AttendanceLocalDataSource(locator<DatabaseHelper>()),
+  );
+  locator.registerFactory<AttendanceRepository>(
+    () => AttendanceRepositoryImpl(locator<AttendanceLocalDataSource>()),
+  );
+  locator.registerFactory<AttendanceCubit>(
+    () => AttendanceCubit(locator<AttendanceRepository>()),
   );
 }

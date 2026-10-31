@@ -10,6 +10,9 @@ import 'package:term/features/groups/domain/entities/study_group.dart';
 import 'package:term/features/groups/domain/repositories/group_repository.dart';
 import 'package:term/features/groups/presentation/cubit/group_cubit.dart';
 import 'package:term/features/groups/presentation/state/group_state.dart';
+import 'package:term/features/schedules/presentation/cubit/schedule_cubit.dart';
+import 'package:term/features/lessons/presentation/cubit/lesson_cubit.dart';
+import 'package:term/features/attendance/presentation/cubit/attendance_cubit.dart';
 import 'package:term/features/students/domain/entities/student.dart';
 
 void main() {
@@ -196,7 +199,21 @@ void main() {
       final locator = GetIt.asNewInstance();
       locator.registerSingleton<DatabaseHelper>(database);
       registerGroupDependencies(locator);
-      expect(locator<GroupCubit>(), isA<GroupCubit>());
+      registerScheduleDependencies(locator);
+      registerLessonDependencies(locator);
+      registerAttendanceDependencies(locator);
+      final groupCubit = locator<GroupCubit>();
+      final scheduleCubit = locator<ScheduleCubit>();
+      final lessonCubit = locator<LessonCubit>();
+      final attendanceCubit = locator<AttendanceCubit>();
+      expect(groupCubit, isA<GroupCubit>());
+      expect(scheduleCubit, isA<ScheduleCubit>());
+      expect(lessonCubit, isA<LessonCubit>());
+      expect(attendanceCubit, isA<AttendanceCubit>());
+      await groupCubit.close();
+      await scheduleCubit.close();
+      await lessonCubit.close();
+      await attendanceCubit.close();
       await locator.reset();
     },
   );

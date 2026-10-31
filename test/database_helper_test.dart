@@ -17,10 +17,21 @@ void main() {
   test('Database opens and tables exist', () async {
     // simple query to list tables
     final result = await dbHelper.db.rawQuery(
-        "SELECT name FROM sqlite_master WHERE type='table'");
+      "SELECT name FROM sqlite_master WHERE type='table'",
+    );
     final tableNames = result.map((e) => e['name'] as String).toSet();
-    expect(tableNames, containsAll(['students', 'groups', 'group_students',
-      'group_schedules', 'lessons', 'attendance_records', 'app_settings']));
+    expect(
+      tableNames,
+      containsAll([
+        'students',
+        'groups',
+        'group_students',
+        'group_schedules',
+        'lessons',
+        'attendance_records',
+        'app_settings',
+      ]),
+    );
   });
 
   test('Deleting a group cascades to related tables', () async {
@@ -62,7 +73,11 @@ void main() {
     });
 
     // Delete group
-    int deleted = await dbHelper.db.delete('groups', where: 'id = ?', whereArgs: [groupId]);
+    int deleted = await dbHelper.db.delete(
+      'groups',
+      where: 'id = ?',
+      whereArgs: [groupId],
+    );
     expect(deleted, equals(1));
 
     // Verify cascade deletions
@@ -107,13 +122,16 @@ void main() {
     });
     // Attempt to delete student, should fail due to RESTRICT
     try {
-      await dbHelper.db.delete('students', where: 'id = ?', whereArgs: [studentId]);
+      await dbHelper.db.delete(
+        'students',
+        where: 'id = ?',
+        whereArgs: [studentId],
+      );
       fail('Student deletion should have been restricted');
     } catch (e) {
       expect(e, isA<DatabaseException>());
     }
   });
-
 
   test('Insert student succeeds and enforces unique id', () async {
     // Insert a student
@@ -140,5 +158,4 @@ void main() {
       expect(e, isA<DatabaseException>());
     }
   });
-
 }

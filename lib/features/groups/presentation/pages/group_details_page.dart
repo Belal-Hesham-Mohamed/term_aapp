@@ -7,6 +7,8 @@ import '../cubit/group_cubit.dart';
 import '../state/group_state.dart';
 import 'group_form_page.dart';
 import 'student_enrollment_page.dart';
+import '../../../schedules/presentation/pages/group_schedules_section.dart';
+import '../../../lessons/presentation/pages/group_lessons_section.dart';
 
 class GroupDetailsPage extends StatelessWidget {
   final int groupId;
@@ -100,6 +102,8 @@ class _GroupDetailsView extends StatelessWidget {
                 title: Text(l10n.activeStudents),
                 subtitle: Text('${state.students.length}'),
               ),
+              GroupSchedulesSection(groupId: groupId),
+              GroupLessonsSection(groupId: groupId),
               const Divider(),
               if (state.students.isEmpty)
                 Padding(

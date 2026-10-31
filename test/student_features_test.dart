@@ -21,11 +21,25 @@ void main() {
 
   tearDown(() async => db.db.close());
 
-  Student makeStudent({String name = 'Mona', String? phone = '123', int? age = 12,
-      String? guardian = '456', String? notes = 'note'}) {
+  Student makeStudent({
+    String name = 'Mona',
+    String? phone = '123',
+    int? age = 12,
+    String? guardian = '456',
+    String? notes = 'note',
+  }) {
     final now = DateTime.now().millisecondsSinceEpoch;
-    return Student(id: 0, name: name, grade: '5', phone: phone, age: age,
-        guardianPhone: guardian, notes: notes, createdAt: now, updatedAt: now);
+    return Student(
+      id: 0,
+      name: name,
+      grade: '5',
+      phone: phone,
+      age: age,
+      guardianPhone: guardian,
+      notes: notes,
+      createdAt: now,
+      updatedAt: now,
+    );
   }
 
   test('creates a student and persists optional data', () async {
@@ -35,20 +49,29 @@ void main() {
     expect(students.single.phone, '123');
   });
 
-  test('updates student and can clear nullable values after SQLite reload', () async {
-    final id = await repository.addStudent(makeStudent());
-    final original = (await repository.getActiveStudents()).single;
-    await repository.updateStudent(original.copyWith(
-      id: id, name: 'Mona A', phone: null, age: null,
-      guardianPhone: null, notes: null,
-    ));
-    final loaded = (await repository.getActiveStudents()).single;
-    expect(loaded.name, 'Mona A');
-    expect(loaded.phone, isNull);
-    expect(loaded.age, isNull);
-    expect(loaded.guardianPhone, isNull);
-    expect(loaded.notes, isNull);
-  });
+  test(
+    'updates student and can clear nullable values after SQLite reload',
+    () async {
+      final id = await repository.addStudent(makeStudent());
+      final original = (await repository.getActiveStudents()).single;
+      await repository.updateStudent(
+        original.copyWith(
+          id: id,
+          name: 'Mona A',
+          phone: null,
+          age: null,
+          guardianPhone: null,
+          notes: null,
+        ),
+      );
+      final loaded = (await repository.getActiveStudents()).single;
+      expect(loaded.name, 'Mona A');
+      expect(loaded.phone, isNull);
+      expect(loaded.age, isNull);
+      expect(loaded.guardianPhone, isNull);
+      expect(loaded.notes, isNull);
+    },
+  );
 
   test('omitted nullable copyWith values preserve existing values', () {
     final original = makeStudent();
@@ -63,13 +86,16 @@ void main() {
     expect(await repository.searchStudents('Mona'), isEmpty);
   });
 
-  test('search matches name and phone; empty query returns all active students', () async {
-    await repository.addStudent(makeStudent(name: 'Mona', phone: '555123'));
-    await repository.addStudent(makeStudent(name: 'Sara', phone: '999'));
-    expect((await repository.searchStudents('Mon')).single.name, 'Mona');
-    expect((await repository.searchStudents('555')).single.name, 'Mona');
-    expect(await repository.searchStudents(''), hasLength(2));
-  });
+  test(
+    'search matches name and phone; empty query returns all active students',
+    () async {
+      await repository.addStudent(makeStudent(name: 'Mona', phone: '555123'));
+      await repository.addStudent(makeStudent(name: 'Sara', phone: '999'));
+      expect((await repository.searchStudents('Mon')).single.name, 'Mona');
+      expect((await repository.searchStudents('555')).single.name, 'Mona');
+      expect(await repository.searchStudents(''), hasLength(2));
+    },
+  );
 
   test('out of order searches keep the newest result', () async {
     final controlled = _ControlledRepository();
