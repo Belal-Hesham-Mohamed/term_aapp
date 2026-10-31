@@ -89,4 +89,63 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidAge => 'Enter a valid non-negative age.';
+
+  @override
+  String get groupName => 'Group name';
+
+  @override
+  String get targetGrade => 'Target grade';
+
+  @override
+  String get createGroup => 'Create group';
+
+  @override
+  String get editGroup => 'Edit group';
+
+  @override
+  String get groupDetails => 'Group details';
+
+  @override
+  String get addStudents => 'Add students';
+
+  @override
+  String get removeStudent => 'Remove student';
+
+  @override
+  String removeStudentConfirm(Object studentName) {
+    return 'Remove $studentName from this group?';
+  }
+
+  @override
+  String get activeStudents => 'Active students';
+
+  @override
+  String get noEnrolledStudents => 'No students are enrolled in this group.';
+
+  @override
+  String get noAvailableStudents => 'There are no students available to add.';
+
+  @override
+  String addSelectedStudents(int count) {
+    return 'Add selected students ($count)';
+  }
+
+  @override
+  String get duplicateGroupName => 'A group with this name already exists.';
+
+  @override
+  String get groupSaveFailed =>
+      'Could not save the group. Your changes are still here; please try again.';
+
+  @override
+  String get groupLoadFailed => 'Could not load group data. Please try again.';
+
+  @override
+  String get groupSearchHint => 'Search by group name or target grade';
+
+  @override
+  String get noGroups => 'No groups yet.';
+
+  @override
+  String get noGroupsFound => 'No matching groups found.';
 }

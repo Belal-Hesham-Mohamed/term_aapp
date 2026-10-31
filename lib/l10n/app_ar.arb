@@ -26,6 +26,26 @@
   "noResults": "لا توجد نتائج",
   "saving": "جارٍ الحفظ...",
   "saveFailed": "تعذر حفظ بيانات الطالب. تغييراتك ما زالت موجودة، حاول مرة أخرى.",
-  "invalidAge": "أدخل عمراً صحيحاً غير سالب."
+  "invalidAge": "أدخل عمراً صحيحاً غير سالب.",
+  "groupName": "اسم المجموعة",
+  "targetGrade": "الصف المستهدف",
+  "createGroup": "إنشاء مجموعة",
+  "editGroup": "تعديل المجموعة",
+  "groupDetails": "تفاصيل المجموعة",
+  "addStudents": "إضافة طلاب",
+  "removeStudent": "إزالة الطالب",
+  "removeStudentConfirm": "هل تريد إزالة {studentName} من هذه المجموعة؟",
+  "@removeStudentConfirm": {"placeholders": {"studentName": {}}},
+  "activeStudents": "الطلاب النشطون",
+  "noEnrolledStudents": "لا يوجد طلاب مسجلون في هذه المجموعة.",
+  "noAvailableStudents": "لا يوجد طلاب متاحون للإضافة.",
+  "addSelectedStudents": "إضافة الطلاب المحددين ({count})",
+  "@addSelectedStudents": {"placeholders": {"count": {"type": "int"}}},
+  "duplicateGroupName": "توجد مجموعة أخرى بهذا الاسم.",
+  "groupSaveFailed": "تعذر حفظ المجموعة. تغييراتك ما زالت موجودة، حاول مرة أخرى.",
+  "groupLoadFailed": "تعذر تحميل بيانات المجموعة. حاول مرة أخرى.",
+  "groupSearchHint": "ابحث باسم المجموعة أو الصف المستهدف",
+  "noGroups": "لا توجد مجموعات بعد.",
+  "noGroupsFound": "لم يتم العثور على مجموعات مطابقة."
 }
 

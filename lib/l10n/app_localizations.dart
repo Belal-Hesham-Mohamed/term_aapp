@@ -259,6 +259,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter a valid non-negative age.'**
   String get invalidAge;
+
+  /// No description provided for @groupName.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get groupName;
+
+  /// No description provided for @targetGrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Target grade'**
+  String get targetGrade;
+
+  /// No description provided for @createGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create group'**
+  String get createGroup;
+
+  /// No description provided for @editGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit group'**
+  String get editGroup;
+
+  /// No description provided for @groupDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Group details'**
+  String get groupDetails;
+
+  /// No description provided for @addStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'Add students'**
+  String get addStudents;
+
+  /// No description provided for @removeStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove student'**
+  String get removeStudent;
+
+  /// No description provided for @removeStudentConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {studentName} from this group?'**
+  String removeStudentConfirm(Object studentName);
+
+  /// No description provided for @activeStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'Active students'**
+  String get activeStudents;
+
+  /// No description provided for @noEnrolledStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'No students are enrolled in this group.'**
+  String get noEnrolledStudents;
+
+  /// No description provided for @noAvailableStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no students available to add.'**
+  String get noAvailableStudents;
+
+  /// No description provided for @addSelectedStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'Add selected students ({count})'**
+  String addSelectedStudents(int count);
+
+  /// No description provided for @duplicateGroupName.
+  ///
+  /// In en, this message translates to:
+  /// **'A group with this name already exists.'**
+  String get duplicateGroupName;
+
+  /// No description provided for @groupSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the group. Your changes are still here; please try again.'**
+  String get groupSaveFailed;
+
+  /// No description provided for @groupLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load group data. Please try again.'**
+  String get groupLoadFailed;
+
+  /// No description provided for @groupSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by group name or target grade'**
+  String get groupSearchHint;
+
+  /// No description provided for @noGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'No groups yet.'**
+  String get noGroups;
+
+  /// No description provided for @noGroupsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching groups found.'**
+  String get noGroupsFound;
 }
 
 class _AppLocalizationsDelegate

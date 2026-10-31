@@ -1,6 +1,7 @@
 // lib/core/navigation/main_navigation.dart
 import 'package:flutter/material.dart';
 import '../../features/students/presentation/pages/student_list_page.dart';
+import '../../features/groups/presentation/pages/groups_page.dart';
 import '../../l10n/app_localizations.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -16,7 +17,7 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _pages = const [
     _PlaceholderPage(titleKey: 'home'),
     StudentListPage(),
-    _PlaceholderPage(titleKey: 'groups'),
+    GroupsPage(),
     _PlaceholderPage(titleKey: 'lessons'),
     _PlaceholderPage(titleKey: 'more'),
   ];
@@ -26,10 +27,22 @@ class _MainNavigationState extends State<MainNavigation> {
     final l10n = AppLocalizations.of(context)!;
     final items = [
       BottomNavigationBarItem(icon: const Icon(Icons.home), label: l10n.home),
-      BottomNavigationBarItem(icon: const Icon(Icons.people), label: l10n.students),
-      BottomNavigationBarItem(icon: const Icon(Icons.group_work), label: l10n.groups),
-      BottomNavigationBarItem(icon: const Icon(Icons.event_note), label: l10n.lessons),
-      BottomNavigationBarItem(icon: const Icon(Icons.more_horiz), label: l10n.more),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.people),
+        label: l10n.students,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.group_work),
+        label: l10n.groups,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.event_note),
+        label: l10n.lessons,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.more_horiz),
+        label: l10n.more,
+      ),
     ];
 
     return Scaffold(

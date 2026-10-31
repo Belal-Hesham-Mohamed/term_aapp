@@ -6,6 +6,10 @@ import '../../features/students/data/datasources/student_local_datasource.dart';
 import '../../features/students/domain/repositories/student_repository.dart';
 import '../../features/students/data/repositories/student_repository_impl.dart';
 import '../../features/students/presentation/cubit/student_cubit.dart';
+import '../../features/groups/data/datasources/group_local_datasource.dart';
+import '../../features/groups/data/repositories/group_repository_impl.dart';
+import '../../features/groups/domain/repositories/group_repository.dart';
+import '../../features/groups/presentation/cubit/group_cubit.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -16,13 +20,11 @@ Future<void> setup() async {
   }
 
   // Register DatabaseHelper as a singleton and initialize it immediately.
-  getIt.registerSingletonAsync<DatabaseHelper>(
-    () async {
-      final helper = DatabaseHelper();
-      await helper.init();
-      return helper;
-    },
-  );
+  getIt.registerSingletonAsync<DatabaseHelper>(() async {
+    final helper = DatabaseHelper();
+    await helper.init();
+    return helper;
+  });
 
   // Register the raw Database instance, depending on DatabaseHelper.
   getIt.registerSingletonWithDependencies<Database>(
@@ -45,5 +47,19 @@ Future<void> setup() async {
     () => StudentCubit(getIt<StudentRepository>()),
   );
 
+  registerGroupDependencies(getIt);
+
   await getIt.allReady();
+}
+
+void registerGroupDependencies(GetIt locator) {
+  locator.registerFactory<GroupLocalDataSource>(
+    () => GroupLocalDataSource(locator<DatabaseHelper>()),
+  );
+  locator.registerFactory<GroupRepository>(
+    () => GroupRepositoryImpl(locator<GroupLocalDataSource>()),
+  );
+  locator.registerFactory<GroupCubit>(
+    () => GroupCubit(locator<GroupRepository>()),
+  );
 }

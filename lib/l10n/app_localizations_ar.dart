@@ -89,4 +89,63 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get invalidAge => 'أدخل عمراً صحيحاً غير سالب.';
+
+  @override
+  String get groupName => 'اسم المجموعة';
+
+  @override
+  String get targetGrade => 'الصف المستهدف';
+
+  @override
+  String get createGroup => 'إنشاء مجموعة';
+
+  @override
+  String get editGroup => 'تعديل المجموعة';
+
+  @override
+  String get groupDetails => 'تفاصيل المجموعة';
+
+  @override
+  String get addStudents => 'إضافة طلاب';
+
+  @override
+  String get removeStudent => 'إزالة الطالب';
+
+  @override
+  String removeStudentConfirm(Object studentName) {
+    return 'هل تريد إزالة $studentName من هذه المجموعة؟';
+  }
+
+  @override
+  String get activeStudents => 'الطلاب النشطون';
+
+  @override
+  String get noEnrolledStudents => 'لا يوجد طلاب مسجلون في هذه المجموعة.';
+
+  @override
+  String get noAvailableStudents => 'لا يوجد طلاب متاحون للإضافة.';
+
+  @override
+  String addSelectedStudents(int count) {
+    return 'إضافة الطلاب المحددين ($count)';
+  }
+
+  @override
+  String get duplicateGroupName => 'توجد مجموعة أخرى بهذا الاسم.';
+
+  @override
+  String get groupSaveFailed =>
+      'تعذر حفظ المجموعة. تغييراتك ما زالت موجودة، حاول مرة أخرى.';
+
+  @override
+  String get groupLoadFailed => 'تعذر تحميل بيانات المجموعة. حاول مرة أخرى.';
+
+  @override
+  String get groupSearchHint => 'ابحث باسم المجموعة أو الصف المستهدف';
+
+  @override
+  String get noGroups => 'لا توجد مجموعات بعد.';
+
+  @override
+  String get noGroupsFound => 'لم يتم العثور على مجموعات مطابقة.';
 }

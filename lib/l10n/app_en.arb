@@ -26,6 +26,26 @@
   "noResults": "No results",
   "saving": "Saving...",
   "saveFailed": "Could not save the student. Your changes are still here; please try again.",
-  "invalidAge": "Enter a valid non-negative age."
+  "invalidAge": "Enter a valid non-negative age.",
+  "groupName": "Group name",
+  "targetGrade": "Target grade",
+  "createGroup": "Create group",
+  "editGroup": "Edit group",
+  "groupDetails": "Group details",
+  "addStudents": "Add students",
+  "removeStudent": "Remove student",
+  "removeStudentConfirm": "Remove {studentName} from this group?",
+  "@removeStudentConfirm": {"placeholders": {"studentName": {}}},
+  "activeStudents": "Active students",
+  "noEnrolledStudents": "No students are enrolled in this group.",
+  "noAvailableStudents": "There are no students available to add.",
+  "addSelectedStudents": "Add selected students ({count})",
+  "@addSelectedStudents": {"placeholders": {"count": {"type": "int"}}},
+  "duplicateGroupName": "A group with this name already exists.",
+  "groupSaveFailed": "Could not save the group. Your changes are still here; please try again.",
+  "groupLoadFailed": "Could not load group data. Please try again.",
+  "groupSearchHint": "Search by group name or target grade",
+  "noGroups": "No groups yet.",
+  "noGroupsFound": "No matching groups found."
 }
 
