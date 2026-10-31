@@ -1,0 +1,12 @@
+﻿{
+  "@@locale": "en",
+  "appTitle": "TERM",
+  "home": "Home",
+  "students": "Students",
+  "groups": "Groups",
+  "lessons": "Lessons",
+  "more": "More",
+  "noStudents": "No students found.",
+  "grade": "Grade",
+  "error": "Error"
+}

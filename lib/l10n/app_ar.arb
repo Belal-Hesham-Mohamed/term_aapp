@@ -1,0 +1,12 @@
+﻿{
+  "@@locale": "ar",
+  "appTitle": "TERM",
+  "home": "الرئيسية",
+  "students": "الطلاب",
+  "groups": "المجموعات",
+  "lessons": "الدروس",
+  "more": "المزيد",
+  "noStudents": "لا يوجد طلاب",
+  "grade": "الصف",
+  "error": "خطأ"
+}

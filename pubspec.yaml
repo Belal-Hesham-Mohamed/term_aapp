@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.8
   sqflite: ^2.3.0
@@ -39,14 +41,12 @@ dependencies:
   sqflite_common_ffi: ^2.4.1
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
+  intl: ^0.20.2
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # For tests on desktop, use ffi implementation of sqflite
-  sqflite_common_ffi: ^2.4.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -58,8 +58,8 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
-# The following section is specific to Flutter packages.
 flutter:
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -5,17 +5,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/student_cubit.dart';
 import '../state/student_state.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class StudentListPage extends StatelessWidget {
   const StudentListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider<StudentCubit>(
       create: (_) => getIt<StudentCubit>(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Students'),
+          title: Text(l10n.students),
         ),
         body: const _StudentListBody(),
       ),
@@ -24,10 +26,11 @@ class StudentListPage extends StatelessWidget {
 }
 
 class _StudentListBody extends StatelessWidget {
-  const _StudentListBody({super.key});
+  const _StudentListBody();
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<StudentCubit, StudentState>(
       builder: (context, state) {
         if (state is StudentLoading) {
@@ -35,8 +38,8 @@ class _StudentListBody extends StatelessWidget {
         } else if (state is StudentLoaded) {
           final students = state.students;
           if (students.isEmpty) {
-            return const Center(
-              child: Text('No students found.'),
+            return Center(
+              child: Text(l10n.noStudents),
             );
           }
           return ListView.builder(
@@ -45,13 +48,13 @@ class _StudentListBody extends StatelessWidget {
               final student = students[index];
               return ListTile(
                 title: Text(student.name),
-                subtitle: Text('Grade: ${student.grade}'),
+                subtitle: Text('${l10n.grade}: ${student.grade}'),
                 trailing: student.phone != null ? Text(student.phone!) : null,
               );
             },
           );
         } else if (state is StudentError) {
-          return Center(child: Text('Error: ${state.message}'));
+          return Center(child: Text('${l10n.error}: ${state.message}'));
         }
         return const SizedBox.shrink();
       },
