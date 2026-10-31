@@ -84,7 +84,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saving => 'Saving...';
 
   @override
-  String get saveFailed => 'Could not save the student. Your changes are still here; please try again.';
+  String get saveFailed =>
+      'Could not save the student. Your changes are still here; please try again.';
 
   @override
   String get invalidAge => 'Enter a valid non-negative age.';

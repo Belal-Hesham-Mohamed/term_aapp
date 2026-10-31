@@ -84,7 +84,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get saving => 'جارٍ الحفظ...';
 
   @override
-  String get saveFailed => 'تعذر حفظ بيانات الطالب. تغييراتك ما زالت موجودة، حاول مرة أخرى.';
+  String get saveFailed =>
+      'تعذر حفظ بيانات الطالب. تغييراتك ما زالت موجودة، حاول مرة أخرى.';
 
   @override
   String get invalidAge => 'أدخل عمراً صحيحاً غير سالب.';

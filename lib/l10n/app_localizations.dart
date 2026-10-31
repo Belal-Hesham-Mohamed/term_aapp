@@ -247,7 +247,17 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saving...'**
   String get saving;
+
+  /// No description provided for @saveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the student. Your changes are still here; please try again.'**
   String get saveFailed;
+
+  /// No description provided for @invalidAge.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid non-negative age.'**
   String get invalidAge;
 }
 
