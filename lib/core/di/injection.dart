@@ -1,17 +1,20 @@
 // lib/core/di/injection.dart
+import 'package:get_it/get_it.dart';
+import 'package:sqflite/sqflite.dart';
+import '../database/database_helper.dart';
 import '../../features/students/data/datasources/student_local_datasource.dart';
 import '../../features/students/domain/repositories/student_repository.dart';
 import '../../features/students/data/repositories/student_repository_impl.dart';
-import 'package:get_it/get_it.dart';
 import '../../features/students/presentation/cubit/student_cubit.dart';
-
-import 'package:sqflite/sqflite.dart';
-import '../database/database_helper.dart';
 
 final GetIt getIt = GetIt.instance;
 
 /// Call this early (e.g., from main) to register core services.
 Future<void> setup() async {
+  if (getIt.isRegistered<DatabaseHelper>()) {
+    return;
+  }
+
   // Register DatabaseHelper as a singleton and initialize it immediately.
   getIt.registerSingletonAsync<DatabaseHelper>(
     () async {
@@ -42,4 +45,5 @@ Future<void> setup() async {
     () => StudentCubit(getIt<StudentRepository>()),
   );
 
+  await getIt.allReady();
 }
