@@ -1,5 +1,10 @@
 // lib/core/di/injection.dart
+import '../../features/students/data/datasources/student_local_datasource.dart';
+import '../../features/students/domain/repositories/student_repository.dart';
+import '../../features/students/data/repositories/student_repository_impl.dart';
 import 'package:get_it/get_it.dart';
+import '../../features/students/presentation/cubit/student_cubit.dart';
+
 import 'package:sqflite/sqflite.dart';
 import '../database/database_helper.dart';
 
@@ -22,5 +27,19 @@ Future<void> setup() async {
     dependsOn: [DatabaseHelper],
   );
 
-  await getIt.allReady();
+  // Register StudentLocalDataSource
+  getIt.registerFactory<StudentLocalDataSource>(
+    () => StudentLocalDataSource(getIt<DatabaseHelper>()),
+  );
+
+  // Register StudentRepository implementation
+  getIt.registerFactory<StudentRepository>(
+    () => StudentRepositoryImpl(getIt<StudentLocalDataSource>()),
+  );
+
+  // Register StudentCubit
+  getIt.registerFactory<StudentCubit>(
+    () => StudentCubit(getIt<StudentRepository>()),
+  );
+
 }
