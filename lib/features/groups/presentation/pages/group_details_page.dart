@@ -9,6 +9,7 @@ import 'group_form_page.dart';
 import 'student_enrollment_page.dart';
 import '../../../schedules/presentation/pages/group_schedules_section.dart';
 import '../../../lessons/presentation/pages/group_lessons_section.dart';
+import '../../../students/presentation/student_labels.dart';
 
 class GroupDetailsPage extends StatelessWidget {
   final int groupId;
@@ -55,6 +56,11 @@ class _GroupDetailsViewState extends State<_GroupDetailsView> {
     );
     if (changed == true && context.mounted) {
       context.read<GroupCubit>().loadDetails(widget.groupId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.studentEnrolledSuccess),
+        ),
+      );
     }
   }
 
@@ -130,9 +136,9 @@ class _GroupDetailsViewState extends State<_GroupDetailsView> {
               else
                 ...state.students.map(
                   (student) => ListTile(
-                    title: Text(student.name),
+                    title: Text(student.displayName),
                     subtitle: Text(
-                      '${l10n.grade}: ${student.grade}${student.phone?.isNotEmpty == true ? ' | ${student.phone}' : ''}',
+                      '${l10n.grade}: ${localizedGrade(l10n, student.grade)}${student.phone?.isNotEmpty == true ? ' | ${student.phone}' : ''}',
                     ),
                     trailing: IconButton(
                       tooltip: l10n.removeStudent,
@@ -143,7 +149,7 @@ class _GroupDetailsViewState extends State<_GroupDetailsView> {
                           builder: (dialogContext) => AlertDialog(
                             title: Text(l10n.removeStudent),
                             content: Text(
-                              l10n.removeStudentConfirm(student.name),
+                              l10n.removeStudentConfirm(student.displayName),
                             ),
                             actions: [
                               TextButton(

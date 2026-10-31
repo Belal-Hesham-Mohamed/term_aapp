@@ -7,6 +7,7 @@ import '../../../students/domain/entities/student.dart';
 import '../cubit/group_cubit.dart';
 import '../state/group_state.dart';
 import '../../../students/presentation/pages/student_form_page.dart';
+import '../../../students/presentation/student_labels.dart';
 
 class StudentEnrollmentPage extends StatefulWidget {
   final int groupId;
@@ -46,13 +47,24 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
   }
 
   Future<void> _addNewStudent() async {
-    final result = await Navigator.push<Object?>(context, MaterialPageRoute(
-      builder: (_) => StudentFormPage(enrollInGroupId: widget.groupId),
-    ));
+    final result = await Navigator.push<Object?>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => StudentFormPage(enrollInGroupId: widget.groupId),
+      ),
+    );
     if (result is StudentCreationResult && result.created && mounted) {
       await _cubit.loadAvailableStudents(widget.groupId);
-      if (!result.enrolled && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.studentCreatedEnrollmentFailed)));
+      if (result.enrolled && mounted) {
+        Navigator.pop(context, true);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.studentCreatedEnrollmentFailed,
+            ),
+          ),
+        );
       }
     }
   }
@@ -74,19 +86,29 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
             if (state is! GroupAvailableStudentsLoaded) {
               return const Center(child: CircularProgressIndicator());
             }
-            return Column(children: [
-              Padding(padding: const EdgeInsets.all(12), child: Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: FilledButton.icon(onPressed: _addNewStudent,
-                  icon: const Icon(Icons.add), label: Text(l10n.addNewStudent)),
-              )),
-              Expanded(child: state.students.isEmpty
-                ? Center(child: Text(l10n.noAvailableStudents))
-                : ListView.builder(
-                    itemCount: state.students.length,
-                    itemBuilder: (context, index) => _studentTile(state.students[index]),
-                  )),
-            ]
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: FilledButton.icon(
+                      onPressed: _addNewStudent,
+                      icon: const Icon(Icons.add),
+                      label: Text(l10n.addNewStudent),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: state.students.isEmpty
+                      ? Center(child: Text(l10n.noAvailableStudents))
+                      : ListView.builder(
+                          itemCount: state.students.length,
+                          itemBuilder: (context, index) =>
+                              _studentTile(state.students[index]),
+                        ),
+                ),
+              ],
             );
           },
         ),
@@ -116,7 +138,9 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
         _selected.remove(student.id);
       }
     }),
-    title: Text(student.name),
-    subtitle: Text(student.grade),
+    title: Text(student.displayName),
+    subtitle: Text(
+      localizedGrade(AppLocalizations.of(context)!, student.grade),
+    ),
   );
 }

@@ -13,6 +13,10 @@ class Student {
   final int createdAt;
   final int updatedAt;
   final int? archivedAt;
+  final String? firstName;
+  final String? fatherName;
+  final String? familyName;
+  final int duplicateIndex;
 
   Student({
     required this.id,
@@ -25,7 +29,20 @@ class Student {
     required this.createdAt,
     required this.updatedAt,
     this.archivedAt,
+    this.firstName,
+    this.fatherName,
+    this.familyName,
+    this.duplicateIndex = 1,
   });
+
+  String get fullName => [firstName, fatherName, familyName]
+      .whereType<String>()
+      .where((part) => part.trim().isNotEmpty)
+      .map((part) => part.trim())
+      .join(' ');
+  String get displayName => duplicateIndex > 1
+      ? '${fullName.isNotEmpty ? fullName : name} ($duplicateIndex)'
+      : (fullName.isNotEmpty ? fullName : name);
 
   Student copyWith({
     int? id,
@@ -38,6 +55,10 @@ class Student {
     Object? archivedAt = _notProvided,
     int? createdAt,
     int? updatedAt,
+    Object? firstName = _notProvided,
+    Object? fatherName = _notProvided,
+    Object? familyName = _notProvided,
+    int? duplicateIndex,
   }) {
     return Student(
       id: id ?? this.id,
@@ -54,6 +75,16 @@ class Student {
       archivedAt: identical(archivedAt, _notProvided)
           ? this.archivedAt
           : archivedAt as int?,
+      firstName: identical(firstName, _notProvided)
+          ? this.firstName
+          : firstName as String?,
+      fatherName: identical(fatherName, _notProvided)
+          ? this.fatherName
+          : fatherName as String?,
+      familyName: identical(familyName, _notProvided)
+          ? this.familyName
+          : familyName as String?,
+      duplicateIndex: duplicateIndex ?? this.duplicateIndex,
     );
   }
 
@@ -68,6 +99,10 @@ class Student {
     createdAt: map['created_at'] as int,
     updatedAt: map['updated_at'] as int,
     archivedAt: map['archived_at'] as int?,
+    firstName: map['first_name'] as String?,
+    fatherName: map['father_name'] as String?,
+    familyName: map['family_name'] as String?,
+    duplicateIndex: map['duplicate_index'] as int? ?? 1,
   );
 
   Map<String, dynamic> toMap() {
@@ -82,6 +117,10 @@ class Student {
       'created_at': createdAt,
       'updated_at': updatedAt,
       'archived_at': archivedAt,
+      'first_name': firstName,
+      'father_name': fatherName,
+      'family_name': familyName,
+      'duplicate_index': duplicateIndex,
     };
   }
 }

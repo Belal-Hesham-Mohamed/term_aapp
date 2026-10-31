@@ -24,6 +24,19 @@ class StudentRepositoryImpl implements StudentRepository {
       dataSource.findByNameAndGrade(name, grade);
 
   @override
+  Future<List<Student>> findPotentialDuplicates({
+    required String firstName,
+    required String fatherName,
+    required String familyName,
+    required String grade,
+  }) => dataSource.findPotentialDuplicates(
+    firstName: firstName,
+    fatherName: fatherName,
+    familyName: familyName,
+    grade: grade,
+  );
+
+  @override
   Future<int> updateStudent(Student student) =>
       dataSource.updateStudent(student);
 

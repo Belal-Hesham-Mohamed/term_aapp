@@ -1,12 +1,13 @@
-// lib/features/students/presentation/pages/student_form_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../cubit/student_cubit.dart';
-import '../../domain/entities/student.dart';
-import '../../domain/repositories/student_repository.dart';
-import '../../../../l10n/app_localizations.dart';
+
 import '../../../../core/di/injection.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../groups/domain/repositories/group_repository.dart';
+import '../../domain/entities/student.dart';
+import '../../domain/student_rules.dart';
+import '../student_labels.dart';
+import '../cubit/student_cubit.dart';
 
 class StudentFormPage extends StatefulWidget {
   final Student? student;
@@ -20,19 +21,24 @@ class StudentFormPage extends StatefulWidget {
 class StudentCreationResult {
   final bool created;
   final bool enrolled;
-  const StudentCreationResult({required this.created, required this.enrolled});
+  final int? studentId;
+  const StudentCreationResult({
+    required this.created,
+    required this.enrolled,
+    this.studentId,
+  });
 }
 
 class _StudentFormPageState extends State<StudentFormPage> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nameController;
-  late final TextEditingController _fatherController;
-  late final TextEditingController _familyController;
-  late final TextEditingController _gradeController;
-  late final TextEditingController _phoneController;
-  late final TextEditingController _ageController;
-  late final TextEditingController _guardianController;
-  late final TextEditingController _notesController;
+  late final TextEditingController _first;
+  late final TextEditingController _father;
+  late final TextEditingController _family;
+  late final TextEditingController _phone;
+  late final TextEditingController _age;
+  late final TextEditingController _guardian;
+  late final TextEditingController _notes;
+  late String _grade;
   bool _saving = false;
   String? _saveError;
 
@@ -41,109 +47,209 @@ class _StudentFormPageState extends State<StudentFormPage> {
   @override
   void initState() {
     super.initState();
-    final s = widget.student;
-    _nameController = TextEditingController(text: s?.name ?? '');
-    _fatherController = TextEditingController();
-    _familyController = TextEditingController();
-    _gradeController = TextEditingController(text: s?.grade ?? '');
-    _phoneController = TextEditingController(text: s?.phone ?? '');
-    _ageController = TextEditingController(text: s?.age?.toString() ?? '');
-    _guardianController = TextEditingController(text: s?.guardianPhone ?? '');
-    _notesController = TextEditingController(text: s?.notes ?? '');
+    final student = widget.student;
+    _first = TextEditingController(
+      text: student?.firstName ?? student?.name ?? '',
+    );
+    _father = TextEditingController(text: student?.fatherName ?? '');
+    _family = TextEditingController(text: student?.familyName ?? '');
+    _grade = student?.grade ?? StudentRules.gradeIds.first;
+    _phone = TextEditingController(text: student?.phone ?? '');
+    _age = TextEditingController(text: student?.age?.toString() ?? '');
+    _guardian = TextEditingController(text: student?.guardianPhone ?? '');
+    _notes = TextEditingController(text: student?.notes ?? '');
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _fatherController.dispose();
-    _familyController.dispose();
-    _gradeController.dispose();
-    _phoneController.dispose();
-    _ageController.dispose();
-    _guardianController.dispose();
-    _notesController.dispose();
+    _first.dispose();
+    _father.dispose();
+    _family.dispose();
+    _phone.dispose();
+    _age.dispose();
+    _guardian.dispose();
+    _notes.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
-    if (_saving) return;
-    final l10n = AppLocalizations.of(context)!;
-    if (!_formKey.currentState!.validate()) return;
+    if (_saving || !_formKey.currentState!.validate()) return;
     setState(() {
       _saving = true;
       _saveError = null;
     });
     final cubit = getIt<StudentCubit>();
-    bool success = false;
-    if (isEdit && widget.student != null) {
-      final age = int.tryParse(_ageController.text.trim());
-      final updated = widget.student!.copyWith(
-        name: _nameController.text.trim(),
-        grade: _gradeController.text.trim(),
-        phone: _phoneController.text.trim().isEmpty
-            ? null
-            : _phoneController.text.trim(),
-        age: age,
-        guardianPhone: _guardianController.text.trim().isEmpty
-            ? null
-            : _guardianController.text.trim(),
-        notes: _notesController.text.trim().isEmpty
-            ? null
-            : _notesController.text.trim(),
+    final first = StudentRules.normalizeNamePart(_first.text);
+    final father = StudentRules.normalizeNamePart(_father.text);
+    final family = StudentRules.normalizeNamePart(_family.text);
+    var confirmedDuplicate = false;
+    if (!isEdit) {
+      final matches = await cubit.findPotentialDuplicates(
+        firstName: first,
+        fatherName: father,
+        familyName: family,
+        grade: _grade,
       );
-      success = await cubit.updateStudent(updated);
-    } else {
-      final age = int.tryParse(_ageController.text.trim());
-      final parts = [_nameController.text.trim(), _fatherController.text.trim(), _familyController.text.trim()]
-          .where((part) => part.isNotEmpty).toList();
-      final fullName = parts.join(' ');
-      final grade = _gradeController.text.trim();
-      final matches = widget.enrollInGroupId == null ? <Student>[] : await getIt<StudentRepository>().findByNameAndGrade(fullName, grade);
-      if (matches.isNotEmpty) {
-        final proceed = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
-          title: Text(l10n.duplicateStudentTitle),
-          content: Text(l10n.duplicateStudentMessage(matches.map((e) => e.name).join(', '))),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.cancel)),
-            TextButton(onPressed: () => Navigator.pop(context, true), child: Text(l10n.differentStudent)),
-          ],
-        ));
-        if (proceed != true) { if (mounted) setState(() => _saving = false); return; }
-      }
-      final created = await cubit.createStudent(
-        name: fullName,
-        grade: grade,
-        phone: _phoneController.text.trim(),
-        age: age,
-        guardianPhone: _guardianController.text.trim(),
-        notes: _notesController.text.trim(),
-        numberDuplicate: widget.enrollInGroupId != null,
-      );
-      if (created != null && widget.enrollInGroupId != null) {
-        final enrolled = await getIt<GroupRepository>().addStudents(widget.enrollInGroupId!, [created.id]).then((_) => true).catchError((_) => false);
-        if (!enrolled) {
-          if (mounted) Navigator.pop(context, const StudentCreationResult(created: true, enrolled: false));
+      if (matches.isNotEmpty && mounted) {
+        final different = await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: Text(AppLocalizations.of(context)!.duplicateStudentTitle),
+            content: SizedBox(
+              width: 420,
+              child: ListView(
+                shrinkWrap: true,
+                children: matches
+                    .map(
+                      (student) => ListTile(
+                        title: Text(student.displayName),
+                        subtitle: Text(
+                          '${student.grade}${student.phone == null ? '' : ' • ${student.phone}'}',
+                        ),
+                        trailing: IconButton(
+                          tooltip: AppLocalizations.of(
+                            context,
+                          )!.reviewExistingStudent,
+                          icon: const Icon(Icons.visibility),
+                          onPressed: () => showDialog<void>(
+                            context: dialogContext,
+                            builder: (reviewContext) => AlertDialog(
+                              title: Text(student.displayName),
+                              content: Text(
+                                '${student.grade}\n${student.phone ?? ''}\n${student.notes ?? ''}',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(reviewContext),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.cancel,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text(AppLocalizations.of(context)!.duplicateSameStudent),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: Text(AppLocalizations.of(context)!.differentStudent),
+              ),
+            ],
+          ),
+        );
+        if (different != true) {
+          if (mounted) setState(() => _saving = false);
           return;
         }
-        if (mounted) Navigator.pop(context, const StudentCreationResult(created: true, enrolled: true));
-        return;
+        confirmedDuplicate = true;
       }
-      success = created != null;
     }
-    if (mounted) {
-      setState(() {
-        _saving = false;
-        if (!success) _saveError = l10n.saveFailed;
-      });
-      if (success) {
+
+    final phone = StudentRules.normalizePhone(_phone.text);
+    final guardian = StudentRules.normalizePhone(_guardian.text);
+    final age = StudentRules.parseAge(_age.text);
+    bool saved;
+    if (isEdit) {
+      final updated = widget.student!.copyWith(
+        name: '$first $father $family',
+        firstName: first,
+        fatherName: father,
+        familyName: family,
+        grade: _grade,
+        phone: phone.isEmpty ? null : phone,
+        guardianPhone: guardian.isEmpty ? null : guardian,
+        age: age,
+        notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
+      );
+      saved = await cubit.updateStudent(updated);
+      if (saved && mounted) Navigator.pop(context, true);
+    } else {
+      final created = await cubit.createStudent(
+        firstName: first,
+        fatherName: father,
+        familyName: family,
+        grade: _grade,
+        phone: phone,
+        age: age,
+        guardianPhone: guardian,
+        notes: _notes.text,
+        confirmedDifferentStudent: confirmedDuplicate,
+      );
+      saved = created != null;
+      if (created != null && widget.enrollInGroupId != null) {
+        try {
+          await getIt<GroupRepository>().addStudents(widget.enrollInGroupId!, [
+            created.id,
+          ]);
+          if (mounted) {
+            Navigator.pop(
+              context,
+              StudentCreationResult(
+                created: true,
+                enrolled: true,
+                studentId: created.id,
+              ),
+            );
+          }
+          return;
+        } catch (_) {
+          if (mounted) {
+            Navigator.pop(
+              context,
+              StudentCreationResult(
+                created: true,
+                enrolled: false,
+                studentId: created.id,
+              ),
+            );
+          }
+          return;
+        }
+      }
+      if (saved && mounted) {
         Navigator.pop(context, true);
       }
+    }
+    if (!saved && mounted) {
+      setState(() {
+        _saving = false;
+        _saveError = AppLocalizations.of(context)!.saveFailed;
+      });
+    }
+  }
+
+  String? _phoneValidator(String? value) {
+    try {
+      StudentRules.normalizePhone(value ?? '');
+      return null;
+    } on FormatException {
+      return AppLocalizations.of(context)!.invalidPhone;
+    }
+  }
+
+  String? _ageValidator(String? value) {
+    try {
+      StudentRules.parseAge(value ?? '');
+      return null;
+    } on FormatException {
+      return AppLocalizations.of(context)!.ageOutOfRange;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final grades = [...StudentRules.gradeIds];
+    if (!grades.contains(_grade)) grades.insert(0, _grade);
     return BlocProvider.value(
       value: getIt<StudentCubit>(),
       child: Scaffold(
@@ -156,60 +262,68 @@ class _StudentFormPageState extends State<StudentFormPage> {
             key: _formKey,
             child: Column(
               children: [
-                if (widget.enrollInGroupId == null) TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(labelText: l10n.name),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? l10n.required : null,
-                ),
-                if (widget.enrollInGroupId != null) ...[
-                  TextFormField(controller: _nameController, decoration: InputDecoration(labelText: l10n.firstName), validator: (v) => (v == null || v.trim().isEmpty) ? l10n.required : null),
-                  const SizedBox(height: 12),
-                  TextFormField(controller: _fatherController, decoration: InputDecoration(labelText: l10n.fatherName)),
-                  const SizedBox(height: 12),
-                  TextFormField(controller: _familyController, decoration: InputDecoration(labelText: l10n.familyName)),
-                ],
+                _nameField(_first, l10n.firstName),
                 const SizedBox(height: 12),
-                TextFormField(
-                  controller: _gradeController,
+                _nameField(_father, l10n.fatherName),
+                const SizedBox(height: 12),
+                _nameField(_family, l10n.familyName),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  initialValue: _grade,
+                  isExpanded: true,
                   decoration: InputDecoration(labelText: l10n.grade),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? l10n.required : null,
+                  items: grades
+                      .map(
+                        (id) => DropdownMenuItem(
+                          value: id,
+                          child: Text(
+                            StudentRules.gradeIds.contains(id)
+                                ? localizedGrade(l10n, id)
+                                : l10n.legacyGrade(id),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: _saving
+                      ? null
+                      : (value) {
+                          if (value != null) setState(() => _grade = value);
+                        },
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? l10n.required
+                      : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
-                  controller: _phoneController,
+                  controller: _phone,
                   decoration: InputDecoration(labelText: l10n.phone),
                   keyboardType: TextInputType.phone,
+                  validator: _phoneValidator,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
-                  controller: _ageController,
+                  controller: _age,
                   decoration: InputDecoration(labelText: l10n.age),
                   keyboardType: TextInputType.number,
-                  validator: (value) {
-                    final text = value?.trim() ?? '';
-                    if (text.isEmpty) return null;
-                    final age = int.tryParse(text);
-                    return age == null || age < 0 ? l10n.invalidAge : null;
-                  },
+                  validator: _ageValidator,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
-                  controller: _guardianController,
+                  controller: _guardian,
                   decoration: InputDecoration(labelText: l10n.guardianPhone),
                   keyboardType: TextInputType.phone,
+                  validator: _phoneValidator,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
-                  controller: _notesController,
+                  controller: _notes,
                   decoration: InputDecoration(labelText: l10n.notes),
                   maxLines: 3,
                 ),
-                const SizedBox(height: 24),
-                if (_saveError != null) ...[
-                  Align(
-                    alignment: AlignmentDirectional.centerStart,
+                if (_saveError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
                     child: Text(
                       _saveError!,
                       style: TextStyle(
@@ -217,8 +331,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                ],
+                const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -233,4 +346,13 @@ class _StudentFormPageState extends State<StudentFormPage> {
       ),
     );
   }
+
+  Widget _nameField(TextEditingController controller, String label) =>
+      TextFormField(
+        controller: controller,
+        decoration: InputDecoration(labelText: label),
+        validator: (value) => (value == null || value.trim().isEmpty)
+            ? AppLocalizations.of(context)!.required
+            : null,
+      );
 }

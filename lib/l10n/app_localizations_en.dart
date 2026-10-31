@@ -153,6 +153,62 @@ class AppLocalizationsEn extends AppLocalizations {
       'Student created, but could not be added to this group. Add the existing student from the enrollment list.';
 
   @override
+  String get invalidPhone => 'Enter a valid Egyptian mobile number.';
+
+  @override
+  String get ageOutOfRange => 'Age must be between 4 and 30.';
+
+  @override
+  String get gradePrimary1 => 'First Primary';
+
+  @override
+  String get gradePrimary2 => 'Second Primary';
+
+  @override
+  String get gradePrimary3 => 'Third Primary';
+
+  @override
+  String get gradePrimary4 => 'Fourth Primary';
+
+  @override
+  String get gradePrimary5 => 'Fifth Primary';
+
+  @override
+  String get gradePrimary6 => 'Sixth Primary';
+
+  @override
+  String get gradePreparatory1 => 'First Preparatory';
+
+  @override
+  String get gradePreparatory2 => 'Second Preparatory';
+
+  @override
+  String get gradePreparatory3 => 'Third Preparatory';
+
+  @override
+  String get gradeSecondary1 => 'First Secondary';
+
+  @override
+  String get gradeSecondary2 => 'Second Secondary';
+
+  @override
+  String get gradeSecondary3 => 'Third Secondary';
+
+  @override
+  String legacyGrade(Object grade) {
+    return 'Legacy grade: $grade';
+  }
+
+  @override
+  String get duplicateSameStudent => 'This is the same student';
+
+  @override
+  String get reviewExistingStudent => 'Review existing student';
+
+  @override
+  String get studentEnrolledSuccess => 'Student added to the group.';
+
+  @override
   String addSelectedStudents(int count) {
     return 'Add selected students ($count)';
   }

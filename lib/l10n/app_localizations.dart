@@ -374,6 +374,114 @@ abstract class AppLocalizations {
   /// **'Student created, but could not be added to this group. Add the existing student from the enrollment list.'**
   String get studentCreatedEnrollmentFailed;
 
+  /// No description provided for @invalidPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid Egyptian mobile number.'**
+  String get invalidPhone;
+
+  /// No description provided for @ageOutOfRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Age must be between 4 and 30.'**
+  String get ageOutOfRange;
+
+  /// No description provided for @gradePrimary1.
+  ///
+  /// In en, this message translates to:
+  /// **'First Primary'**
+  String get gradePrimary1;
+
+  /// No description provided for @gradePrimary2.
+  ///
+  /// In en, this message translates to:
+  /// **'Second Primary'**
+  String get gradePrimary2;
+
+  /// No description provided for @gradePrimary3.
+  ///
+  /// In en, this message translates to:
+  /// **'Third Primary'**
+  String get gradePrimary3;
+
+  /// No description provided for @gradePrimary4.
+  ///
+  /// In en, this message translates to:
+  /// **'Fourth Primary'**
+  String get gradePrimary4;
+
+  /// No description provided for @gradePrimary5.
+  ///
+  /// In en, this message translates to:
+  /// **'Fifth Primary'**
+  String get gradePrimary5;
+
+  /// No description provided for @gradePrimary6.
+  ///
+  /// In en, this message translates to:
+  /// **'Sixth Primary'**
+  String get gradePrimary6;
+
+  /// No description provided for @gradePreparatory1.
+  ///
+  /// In en, this message translates to:
+  /// **'First Preparatory'**
+  String get gradePreparatory1;
+
+  /// No description provided for @gradePreparatory2.
+  ///
+  /// In en, this message translates to:
+  /// **'Second Preparatory'**
+  String get gradePreparatory2;
+
+  /// No description provided for @gradePreparatory3.
+  ///
+  /// In en, this message translates to:
+  /// **'Third Preparatory'**
+  String get gradePreparatory3;
+
+  /// No description provided for @gradeSecondary1.
+  ///
+  /// In en, this message translates to:
+  /// **'First Secondary'**
+  String get gradeSecondary1;
+
+  /// No description provided for @gradeSecondary2.
+  ///
+  /// In en, this message translates to:
+  /// **'Second Secondary'**
+  String get gradeSecondary2;
+
+  /// No description provided for @gradeSecondary3.
+  ///
+  /// In en, this message translates to:
+  /// **'Third Secondary'**
+  String get gradeSecondary3;
+
+  /// No description provided for @legacyGrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy grade: {grade}'**
+  String legacyGrade(Object grade);
+
+  /// No description provided for @duplicateSameStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the same student'**
+  String get duplicateSameStudent;
+
+  /// No description provided for @reviewExistingStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Review existing student'**
+  String get reviewExistingStudent;
+
+  /// No description provided for @studentEnrolledSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Student added to the group.'**
+  String get studentEnrolledSuccess;
+
   /// No description provided for @addSelectedStudents.
   ///
   /// In en, this message translates to:

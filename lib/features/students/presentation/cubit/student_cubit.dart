@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../state/student_state.dart';
 import '../../domain/repositories/student_repository.dart';
 import '../../domain/entities/student.dart';
+import '../../domain/student_rules.dart';
 
 class StudentCubit extends Cubit<StudentState> {
   final StudentRepository repository;
@@ -59,45 +60,50 @@ class StudentCubit extends Cubit<StudentState> {
     }
   }
 
-  Future<bool> addStudent({
-    required String name,
-    required String grade,
-    String? phone,
-    int? age,
-    String? guardianPhone,
-    String? notes,
-  }) async {
-    return await createStudent(name: name, grade: grade, phone: phone, age: age,
-      guardianPhone: guardianPhone, notes: notes) != null;
-  }
-
   Future<Student?> createStudent({
-    required String name,
+    required String firstName,
+    required String fatherName,
+    required String familyName,
     required String grade,
     String? phone,
     int? age,
     String? guardianPhone,
     String? notes,
-    bool numberDuplicate = false,
+    bool confirmedDifferentStudent = false,
   }) async {
     try {
-      var finalName = name.trim();
-      if (numberDuplicate) {
-        final duplicates = await repository.findByNameAndGrade(finalName, grade);
-        if (duplicates.isNotEmpty) {
-          var index = 2;
-          while ((await repository.findByNameAndGrade('$finalName ($index)', grade)).isNotEmpty) { index++; }
-          finalName = '$finalName ($index)';
-        }
+      final first = StudentRules.normalizeNamePart(firstName);
+      final father = StudentRules.normalizeNamePart(fatherName);
+      final family = StudentRules.normalizeNamePart(familyName);
+      if ([first, father, family].any((part) => part.isEmpty) ||
+          !StudentRules.gradeIds.contains(grade)) {
+        return null;
       }
+      final cleanPhone = StudentRules.normalizePhone(phone ?? '');
+      final cleanGuardian = StudentRules.normalizePhone(guardianPhone ?? '');
+      final cleanAge = age == null
+          ? null
+          : StudentRules.parseAge(age.toString());
+      final name = [first, father, family].join(' ');
+      final duplicates = await repository.findPotentialDuplicates(
+        firstName: first,
+        fatherName: father,
+        familyName: family,
+        grade: grade,
+      );
+      if (duplicates.isNotEmpty && !confirmedDifferentStudent) return null;
       final now = DateTime.now().millisecondsSinceEpoch;
       final student = Student(
         id: 0,
-        name: finalName,
+        name: name,
+        firstName: first,
+        fatherName: father,
+        familyName: family,
+        duplicateIndex: duplicates.length + 1,
         grade: grade,
-        phone: phone?.isEmpty == true ? null : phone,
-        age: age,
-        guardianPhone: guardianPhone?.isEmpty == true ? null : guardianPhone,
+        phone: cleanPhone.isEmpty ? null : cleanPhone,
+        age: cleanAge,
+        guardianPhone: cleanGuardian.isEmpty ? null : cleanGuardian,
         notes: notes?.isEmpty == true ? null : notes,
         createdAt: now,
         updatedAt: now,
@@ -111,9 +117,41 @@ class StudentCubit extends Cubit<StudentState> {
     }
   }
 
+  Future<List<Student>> findPotentialDuplicates({
+    required String firstName,
+    required String fatherName,
+    required String familyName,
+    required String grade,
+  }) => repository.findPotentialDuplicates(
+    firstName: firstName,
+    fatherName: fatherName,
+    familyName: familyName,
+    grade: grade,
+  );
+
   Future<bool> updateStudent(Student student) async {
     try {
+      final first = StudentRules.normalizeNamePart(student.firstName ?? '');
+      final father = StudentRules.normalizeNamePart(student.fatherName ?? '');
+      final family = StudentRules.normalizeNamePart(student.familyName ?? '');
+      if ([first, father, family].any((part) => part.isEmpty)) return false;
+      if (StudentRules.gradeIds.contains(student.grade) == false &&
+          student.grade.trim().isEmpty) {
+        return false;
+      }
+      final phone = StudentRules.normalizePhone(student.phone ?? '');
+      final guardian = StudentRules.normalizePhone(student.guardianPhone ?? '');
+      final age = student.age == null
+          ? null
+          : StudentRules.parseAge(student.age.toString());
       final updated = student.copyWith(
+        name: '$first $father $family',
+        firstName: first,
+        fatherName: father,
+        familyName: family,
+        phone: phone.isEmpty ? null : phone,
+        guardianPhone: guardian.isEmpty ? null : guardian,
+        age: age,
         updatedAt: DateTime.now().millisecondsSinceEpoch,
       );
       await repository.updateStudent(updated);

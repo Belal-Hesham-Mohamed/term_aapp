@@ -7,6 +7,7 @@ import '../state/student_state.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'student_form_page.dart';
+import '../student_labels.dart';
 
 class StudentListPage extends StatelessWidget {
   const StudentListPage({super.key});
@@ -94,9 +95,9 @@ class _StudentListBodyState extends State<_StudentListBody> {
                   itemBuilder: (context, index) {
                     final student = students[index];
                     return ListTile(
-                      title: Text(student.name),
+                      title: Text(student.displayName),
                       subtitle: Text(
-                        '${l10n.grade}: ${student.grade}${student.phone != null && student.phone!.isNotEmpty ? ' • ${student.phone}' : ''}',
+                        '${l10n.grade}: ${localizedGrade(l10n, student.grade)}${student.phone != null && student.phone!.isNotEmpty ? ' • ${student.phone}' : ''}',
                       ),
                       onTap: () async {
                         final result = await Navigator.push(

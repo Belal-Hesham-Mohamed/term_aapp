@@ -17,7 +17,7 @@ class AttendanceLocalDataSource {
         INNER JOIN group_students gs ON gs.group_id = l.group_id
         WHERE l.id = ? AND gs.student_id = s.id AND s.archived_at IS NULL
       ) OR ar.id IS NOT NULL
-      ORDER BY s.name COLLATE NOCASE ASC
+      ORDER BY s.name COLLATE NOCASE ASC, s.duplicate_index ASC, s.id ASC
     ''',
       [lessonId, lessonId],
     );

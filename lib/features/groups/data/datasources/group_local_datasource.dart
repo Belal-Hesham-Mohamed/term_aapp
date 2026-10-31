@@ -50,7 +50,7 @@ class GroupLocalDataSource {
       SELECT s.* FROM students s
       INNER JOIN group_students gs ON gs.student_id = s.id
       WHERE gs.group_id = ? AND s.archived_at IS NULL
-      ORDER BY s.name COLLATE NOCASE ASC
+      ORDER BY s.name COLLATE NOCASE ASC, s.duplicate_index ASC, s.id ASC
     ''',
       [groupId],
     );
@@ -66,7 +66,7 @@ class GroupLocalDataSource {
           SELECT 1 FROM group_students gs
           WHERE gs.group_id = ? AND gs.student_id = s.id
         )
-      ORDER BY s.name COLLATE NOCASE ASC
+      ORDER BY s.name COLLATE NOCASE ASC, s.duplicate_index ASC, s.id ASC
     ''',
       [groupId],
     );

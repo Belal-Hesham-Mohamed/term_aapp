@@ -153,6 +153,62 @@ class AppLocalizationsAr extends AppLocalizations {
       'تم إنشاء الطالب، لكن تعذرت إضافته إلى المجموعة. أضف الطالب من قائمة التسجيل.';
 
   @override
+  String get invalidPhone => 'أدخل رقم هاتف محمول مصرياً صحيحاً.';
+
+  @override
+  String get ageOutOfRange => 'يجب أن يكون العمر بين 4 و30 عاماً.';
+
+  @override
+  String get gradePrimary1 => 'الصف الأول الابتدائي';
+
+  @override
+  String get gradePrimary2 => 'الصف الثاني الابتدائي';
+
+  @override
+  String get gradePrimary3 => 'الصف الثالث الابتدائي';
+
+  @override
+  String get gradePrimary4 => 'الصف الرابع الابتدائي';
+
+  @override
+  String get gradePrimary5 => 'الصف الخامس الابتدائي';
+
+  @override
+  String get gradePrimary6 => 'الصف السادس الابتدائي';
+
+  @override
+  String get gradePreparatory1 => 'الصف الأول الإعدادي';
+
+  @override
+  String get gradePreparatory2 => 'الصف الثاني الإعدادي';
+
+  @override
+  String get gradePreparatory3 => 'الصف الثالث الإعدادي';
+
+  @override
+  String get gradeSecondary1 => 'الصف الأول الثانوي';
+
+  @override
+  String get gradeSecondary2 => 'الصف الثاني الثانوي';
+
+  @override
+  String get gradeSecondary3 => 'الصف الثالث الثانوي';
+
+  @override
+  String legacyGrade(Object grade) {
+    return 'صف قديم: $grade';
+  }
+
+  @override
+  String get duplicateSameStudent => 'هذا هو الطالب نفسه';
+
+  @override
+  String get reviewExistingStudent => 'مراجعة الطالب الموجود';
+
+  @override
+  String get studentEnrolledSuccess => 'تمت إضافة الطالب إلى المجموعة.';
+
+  @override
   String addSelectedStudents(int count) {
     return 'إضافة الطلاب المحددين ($count)';
   }

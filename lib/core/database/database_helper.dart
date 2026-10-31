@@ -8,7 +8,7 @@ import 'migrations.dart';
 
 class DatabaseHelper {
   static const String _dbName = 'term.db';
-  static const int _dbVersion = 1;
+  static const int _dbVersion = 2;
 
   Database? _db;
   Database get db => _db!;
@@ -22,7 +22,7 @@ class DatabaseHelper {
       version: _dbVersion,
       onConfigure: (db) async => await db.execute('PRAGMA foreign_keys = ON'),
       onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
+      onUpgrade: migrate,
     );
   }
 
@@ -38,7 +38,7 @@ class DatabaseHelper {
       version: _dbVersion,
       onConfigure: (db) async => await db.execute('PRAGMA foreign_keys = ON'),
       onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
+      onUpgrade: migrate,
     );
   }
 
@@ -52,7 +52,18 @@ class DatabaseHelper {
     await db.execute(Migrations.createAppSettings);
   }
 
-  FutureOr<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // Future migrations will be added here.
+  static FutureOr<void> migrate(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE students ADD COLUMN first_name TEXT');
+      await db.execute('ALTER TABLE students ADD COLUMN father_name TEXT');
+      await db.execute('ALTER TABLE students ADD COLUMN family_name TEXT');
+      await db.execute(
+        'ALTER TABLE students ADD COLUMN duplicate_index INTEGER NOT NULL DEFAULT 1',
+      );
+    }
   }
 }

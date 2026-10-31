@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../students/presentation/student_labels.dart';
 import '../cubit/attendance_cubit.dart';
 import '../state/attendance_state.dart';
 
@@ -69,9 +70,9 @@ class _AttendanceView extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final entry = state.entries[index];
                           return ListTile(
-                            title: Text(entry.student.name),
+                            title: Text(entry.student.displayName),
                             subtitle: Text(
-                              '${l10n.grade}: ${entry.student.grade}',
+                              '${l10n.grade}: ${localizedGrade(l10n, entry.student.grade)}',
                             ),
                             trailing: Wrap(
                               spacing: 6,

@@ -23,6 +23,10 @@ void main() {
 
   Student makeStudent({
     String name = 'Mona',
+    String grade = '5',
+    String? firstName,
+    String? fatherName,
+    String? familyName,
     String? phone = '123',
     int? age = 12,
     String? guardian = '456',
@@ -32,7 +36,10 @@ void main() {
     return Student(
       id: 0,
       name: name,
-      grade: '5',
+      grade: grade,
+      firstName: firstName,
+      fatherName: fatherName,
+      familyName: familyName,
       phone: phone,
       age: age,
       guardianPhone: guardian,
@@ -49,33 +56,99 @@ void main() {
     expect(students.single.phone, '123');
   });
 
-  test('confirmed same-name and grade student gets an automatic display number', () async {
-    await repository.addStudent(makeStudent(name: 'Mona Ahmed'));
+  test(
+    'confirmed same-name and grade student gets an automatic display number',
+    () async {
+      await repository.addStudent(
+        makeStudent(
+          name: 'Mona Ali Ahmed',
+          firstName: 'Mona',
+          fatherName: 'Ali',
+          familyName: 'Ahmed',
+          grade: 'primary_1',
+        ),
+      );
+      final cubit = StudentCubit(repository);
+      final created = await cubit.createStudent(
+        firstName: 'Mona',
+        fatherName: 'Ali',
+        familyName: 'Ahmed',
+        grade: 'primary_1',
+        phone: '01012345678',
+        confirmedDifferentStudent: true,
+      );
+      expect(created?.name, 'Mona Ali Ahmed');
+      expect(created?.displayName, 'Mona Ali Ahmed (2)');
+      expect(created?.grade, 'primary_1');
+      expect(created?.phone, '+201012345678');
+      await cubit.close();
+    },
+  );
+
+  test('duplicate numbering chooses the next unused display number', () async {
+    await repository.addStudent(
+      makeStudent(
+        name: 'Mona Ali Ahmed',
+        firstName: 'Mona',
+        fatherName: 'Ali',
+        familyName: 'Ahmed',
+        grade: 'primary_1',
+      ),
+    );
+    await repository.addStudent(
+      makeStudent(
+        name: 'Mona Ali Ahmed',
+        firstName: 'Mona',
+        fatherName: 'Ali',
+        familyName: 'Ahmed',
+        grade: 'primary_1',
+        phone: '222',
+      ),
+    );
     final cubit = StudentCubit(repository);
     final created = await cubit.createStudent(
-      name: 'Mona Ahmed',
-      grade: '5',
-      phone: '777',
-      numberDuplicate: true,
+      firstName: 'Mona',
+      fatherName: 'Ali',
+      familyName: 'Ahmed',
+      grade: 'primary_1',
+      confirmedDifferentStudent: true,
     );
-    expect(created?.name, 'Mona Ahmed (2)');
-    expect(created?.grade, '5');
-    expect(created?.phone, '777');
+    expect(created?.displayName, 'Mona Ali Ahmed (3)');
     await cubit.close();
   });
 
-  test('duplicate numbering chooses the next unused display number', () async {
-    await repository.addStudent(makeStudent(name: 'Mona Ahmed'));
-    await repository.addStudent(makeStudent(name: 'Mona Ahmed (2)'));
-    final cubit = StudentCubit(repository);
-    final created = await cubit.createStudent(
-      name: 'Mona Ahmed',
-      grade: '5',
-      numberDuplicate: true,
-    );
-    expect(created?.name, 'Mona Ahmed (3)');
-    await cubit.close();
-  });
+  test(
+    'duplicate matching collapses spaces, ignores English case, and includes grade',
+    () async {
+      await repository.addStudent(
+        makeStudent(
+          name: 'Mona Ali Ahmed',
+          firstName: 'Mona',
+          fatherName: 'Ali',
+          familyName: 'Ahmed',
+          grade: 'primary_1',
+        ),
+      );
+      expect(
+        await repository.findPotentialDuplicates(
+          firstName: '  MONA ',
+          fatherName: 'Ali',
+          familyName: 'Ahmed',
+          grade: 'primary_1',
+        ),
+        hasLength(1),
+      );
+      expect(
+        await repository.findPotentialDuplicates(
+          firstName: 'Mona',
+          fatherName: 'Ali',
+          familyName: 'Ahmed',
+          grade: 'primary_2',
+        ),
+        isEmpty,
+      );
+    },
+  );
 
   test(
     'updates student and can clear nullable values after SQLite reload',
@@ -154,7 +227,15 @@ class _ControlledRepository implements StudentRepository {
   @override
   Future<int> addStudent(Student student) async => 1;
   @override
-  Future<List<Student>> findByNameAndGrade(String name, String grade) async => [];
+  Future<List<Student>> findByNameAndGrade(String name, String grade) async =>
+      [];
+  @override
+  Future<List<Student>> findPotentialDuplicates({
+    required String firstName,
+    required String fatherName,
+    required String familyName,
+    required String grade,
+  }) async => [];
   @override
   Future<int> updateStudent(Student student) async => 1;
   @override

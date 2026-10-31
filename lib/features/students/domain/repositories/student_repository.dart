@@ -7,6 +7,12 @@ abstract class StudentRepository {
   Future<List<Student>> searchStudents(String query);
   Future<int> addStudent(Student student);
   Future<List<Student>> findByNameAndGrade(String name, String grade);
+  Future<List<Student>> findPotentialDuplicates({
+    required String firstName,
+    required String fatherName,
+    required String familyName,
+    required String grade,
+  });
   Future<int> updateStudent(Student student);
   Future<int> archiveStudent(int id);
 }
