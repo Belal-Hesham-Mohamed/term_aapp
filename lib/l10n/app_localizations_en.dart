@@ -34,4 +34,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get error => 'Error';
+
+  @override
+  String get addStudent => 'Add Student';
+
+  @override
+  String get editStudent => 'Edit Student';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get age => 'Age';
+
+  @override
+  String get guardianPhone => 'Guardian Phone';
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String get required => 'Required';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get archive => 'Archive';
+
+  @override
+  String get archiveConfirm => 'Archive this student?';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get searchHint => 'Search by name or phone';
+
+  @override
+  String get noResults => 'No results';
+
+  @override
+  String get saving => 'Saving...';
 }

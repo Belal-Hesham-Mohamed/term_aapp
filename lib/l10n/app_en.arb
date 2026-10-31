@@ -8,5 +8,22 @@
   "more": "More",
   "noStudents": "No students found.",
   "grade": "Grade",
-  "error": "Error"
+  "error": "Error",
+  "addStudent": "Add Student",
+  "editStudent": "Edit Student",
+  "name": "Name",
+  "phone": "Phone",
+  "age": "Age",
+  "guardianPhone": "Guardian Phone",
+  "notes": "Notes",
+  "required": "Required",
+  "save": "Save",
+  "cancel": "Cancel",
+  "archive": "Archive",
+  "archiveConfirm": "Archive this student?",
+  "search": "Search",
+  "searchHint": "Search by name or phone",
+  "noResults": "No results",
+  "saving": "Saving..."
 }
+

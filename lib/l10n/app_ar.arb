@@ -8,5 +8,22 @@
   "more": "المزيد",
   "noStudents": "لا يوجد طلاب",
   "grade": "الصف",
-  "error": "خطأ"
+  "error": "خطأ",
+  "addStudent": "إضافة طالب",
+  "editStudent": "تعديل طالب",
+  "name": "الاسم",
+  "phone": "رقم الهاتف",
+  "age": "العمر",
+  "guardianPhone": "رقم ولي الأمر",
+  "notes": "ملاحظات",
+  "required": "مطلوب",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "archive": "أرشفة",
+  "archiveConfirm": "هل تريد أرشفة هذا الطالب؟",
+  "search": "بحث",
+  "searchHint": "بحث بالاسم أو رقم الهاتف",
+  "noResults": "لا توجد نتائج",
+  "saving": "جارٍ الحفظ..."
 }
+

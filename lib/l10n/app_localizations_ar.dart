@@ -34,4 +34,52 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get error => 'خطأ';
+
+  @override
+  String get addStudent => 'إضافة طالب';
+
+  @override
+  String get editStudent => 'تعديل طالب';
+
+  @override
+  String get name => 'الاسم';
+
+  @override
+  String get phone => 'رقم الهاتف';
+
+  @override
+  String get age => 'العمر';
+
+  @override
+  String get guardianPhone => 'رقم ولي الأمر';
+
+  @override
+  String get notes => 'ملاحظات';
+
+  @override
+  String get required => 'مطلوب';
+
+  @override
+  String get save => 'حفظ';
+
+  @override
+  String get cancel => 'إلغاء';
+
+  @override
+  String get archive => 'أرشفة';
+
+  @override
+  String get archiveConfirm => 'هل تريد أرشفة هذا الطالب؟';
+
+  @override
+  String get search => 'بحث';
+
+  @override
+  String get searchHint => 'بحث بالاسم أو رقم الهاتف';
+
+  @override
+  String get noResults => 'لا توجد نتائج';
+
+  @override
+  String get saving => 'جارٍ الحفظ...';
 }
