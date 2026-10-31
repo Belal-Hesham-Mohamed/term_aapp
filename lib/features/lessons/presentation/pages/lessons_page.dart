@@ -53,6 +53,7 @@ class _LessonsList extends StatelessWidget {
         title: Text(groupId == null ? l10n.lessons : l10n.groupLessons),
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip: l10n.addExceptionalLesson,
         onPressed: () => _create(context),
         child: const Icon(Icons.add),
       ),

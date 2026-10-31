@@ -126,6 +126,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noAvailableStudents => 'لا يوجد طلاب متاحون للإضافة.';
 
   @override
+  String get addNewStudent => 'إضافة طالب جديد';
+
+  @override
+  String get firstName => 'الاسم الأول';
+
+  @override
+  String get fatherName => 'اسم الأب';
+
+  @override
+  String get familyName => 'اسم العائلة';
+
+  @override
+  String get duplicateStudentTitle => 'احتمال وجود طالب مكرر';
+
+  @override
+  String duplicateStudentMessage(Object names) {
+    return 'يوجد طالب بهذا الاسم والصف بالفعل: $names. راجع الطالب الحالي أو أكد أن هذا طالب مختلف.';
+  }
+
+  @override
+  String get differentStudent => 'هذا طالب مختلف';
+
+  @override
+  String get studentCreatedEnrollmentFailed =>
+      'تم إنشاء الطالب، لكن تعذرت إضافته إلى المجموعة. أضف الطالب من قائمة التسجيل.';
+
+  @override
   String addSelectedStudents(int count) {
     return 'إضافة الطلاب المحددين ($count)';
   }
@@ -312,4 +339,31 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get attendanceSaveFailed =>
       'تعذر حفظ الحضور. تغييراتك ما زالت موجودة، حاول مرة أخرى.';
+
+  @override
+  String get weeklySchedule => 'الجدول الأسبوعي';
+
+  @override
+  String get addWeeklySchedule => 'إضافة موعد أسبوعي';
+
+  @override
+  String get editWeeklySchedule => 'تعديل الموعد الأسبوعي';
+
+  @override
+  String get recurringWeeklyDescription =>
+      'يتكرر هذا الموعد كل أسبوع في اليوم المحدد.';
+
+  @override
+  String get upcomingLessons => 'الحصص القادمة';
+
+  @override
+  String get noUpcomingLessons =>
+      'لا توجد حصص قادمة خلال الثلاثين يوماً المقبلة.';
+
+  @override
+  String get addExceptionalLesson => 'إضافة حصة استثنائية';
+
+  @override
+  String get exceptionalLessonDescription =>
+      'تُنشأ الحصة لهذا التاريخ فقط ولا تغيّر الجدول الأسبوعي.';
 }

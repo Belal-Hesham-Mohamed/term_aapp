@@ -6,6 +6,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../students/domain/entities/student.dart';
 import '../cubit/group_cubit.dart';
 import '../state/group_state.dart';
+import '../../../students/presentation/pages/student_form_page.dart';
 
 class StudentEnrollmentPage extends StatefulWidget {
   final int groupId;
@@ -44,6 +45,18 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
     if (success) Navigator.pop(context, true);
   }
 
+  Future<void> _addNewStudent() async {
+    final result = await Navigator.push<Object?>(context, MaterialPageRoute(
+      builder: (_) => StudentFormPage(enrollInGroupId: widget.groupId),
+    ));
+    if (result is StudentCreationResult && result.created && mounted) {
+      await _cubit.loadAvailableStudents(widget.groupId);
+      if (!result.enrolled && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.studentCreatedEnrollmentFailed)));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -61,13 +74,19 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
             if (state is! GroupAvailableStudentsLoaded) {
               return const Center(child: CircularProgressIndicator());
             }
-            if (state.students.isEmpty) {
-              return Center(child: Text(l10n.noAvailableStudents));
-            }
-            return ListView.builder(
-              itemCount: state.students.length,
-              itemBuilder: (context, index) =>
-                  _studentTile(state.students[index]),
+            return Column(children: [
+              Padding(padding: const EdgeInsets.all(12), child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: FilledButton.icon(onPressed: _addNewStudent,
+                  icon: const Icon(Icons.add), label: Text(l10n.addNewStudent)),
+              )),
+              Expanded(child: state.students.isEmpty
+                ? Center(child: Text(l10n.noAvailableStudents))
+                : ListView.builder(
+                    itemCount: state.students.length,
+                    itemBuilder: (context, index) => _studentTile(state.students[index]),
+                  )),
+            ]
             );
           },
         ),

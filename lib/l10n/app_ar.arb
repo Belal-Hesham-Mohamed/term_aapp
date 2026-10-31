@@ -39,6 +39,15 @@
   "activeStudents": "الطلاب النشطون",
   "noEnrolledStudents": "لا يوجد طلاب مسجلون في هذه المجموعة.",
   "noAvailableStudents": "لا يوجد طلاب متاحون للإضافة.",
+  "addNewStudent": "إضافة طالب جديد",
+  "firstName": "الاسم الأول",
+  "fatherName": "اسم الأب",
+  "familyName": "اسم العائلة",
+  "duplicateStudentTitle": "احتمال وجود طالب مكرر",
+  "duplicateStudentMessage": "يوجد طالب بهذا الاسم والصف بالفعل: {names}. راجع الطالب الحالي أو أكد أن هذا طالب مختلف.",
+  "@duplicateStudentMessage": {"placeholders": {"names": {}}},
+  "differentStudent": "هذا طالب مختلف",
+  "studentCreatedEnrollmentFailed": "تم إنشاء الطالب، لكن تعذرت إضافته إلى المجموعة. أضف الطالب من قائمة التسجيل.",
   "addSelectedStudents": "إضافة الطلاب المحددين ({count})",
   "@addSelectedStudents": {"placeholders": {"count": {"type": "int"}}},
   "duplicateGroupName": "توجد مجموعة أخرى بهذا الاسم.",
@@ -99,6 +108,14 @@
   "saveAttendance": "حفظ الحضور",
   "attendanceSaved": "تم حفظ الحضور.",
   "attendanceLoadFailed": "تعذر تحميل الحضور. حاول مرة أخرى.",
-  "attendanceSaveFailed": "تعذر حفظ الحضور. تغييراتك ما زالت موجودة، حاول مرة أخرى."
+  "attendanceSaveFailed": "تعذر حفظ الحضور. تغييراتك ما زالت موجودة، حاول مرة أخرى.",
+  "weeklySchedule": "الجدول الأسبوعي",
+  "addWeeklySchedule": "إضافة موعد أسبوعي",
+  "editWeeklySchedule": "تعديل الموعد الأسبوعي",
+  "recurringWeeklyDescription": "يتكرر هذا الموعد كل أسبوع في اليوم المحدد.",
+  "upcomingLessons": "الحصص القادمة",
+  "noUpcomingLessons": "لا توجد حصص قادمة خلال الثلاثين يوماً المقبلة.",
+  "addExceptionalLesson": "إضافة حصة استثنائية",
+  "exceptionalLessonDescription": "تُنشأ الحصة لهذا التاريخ فقط ولا تغيّر الجدول الأسبوعي."
 }
 

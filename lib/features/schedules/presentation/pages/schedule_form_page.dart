@@ -122,7 +122,9 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            widget.schedule == null ? l10n.addSchedule : l10n.editSchedule,
+            widget.schedule == null
+                ? l10n.addWeeklySchedule
+                : l10n.editWeeklySchedule,
           ),
         ),
         body: SingleChildScrollView(
@@ -131,6 +133,13 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
             key: _formKey,
             child: Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(l10n.recurringWeeklyDescription),
+                  ),
+                ),
                 DropdownButtonFormField<int>(
                   initialValue: _weekday,
                   decoration: InputDecoration(labelText: l10n.weekday),

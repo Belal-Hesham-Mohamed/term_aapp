@@ -37,6 +37,14 @@ class StudentLocalDataSource {
     return await dbHelper.db.insert('students', map);
   }
 
+  Future<List<Student>> findByNameAndGrade(String name, String grade) async {
+    final rows = await dbHelper.db.query('students',
+      where: 'archived_at IS NULL AND name = ? COLLATE NOCASE AND grade = ? COLLATE NOCASE',
+      whereArgs: [name.trim(), grade.trim()],
+      orderBy: 'id ASC');
+    return rows.map(Student.fromMap).toList();
+  }
+
   Future<int> updateStudent(Student student) async {
     final map = student.toMap();
     map['updated_at'] = DateTime.now().millisecondsSinceEpoch;

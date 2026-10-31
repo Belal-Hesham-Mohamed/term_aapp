@@ -6,15 +6,37 @@ import '../state/lesson_state.dart';
 
 class LessonCubit extends Cubit<LessonState> {
   final LessonRepository repository;
+  final DateTime Function() clock;
   int _requestId = 0;
   bool _saving = false;
 
-  LessonCubit(this.repository) : super(LessonLoading());
+  LessonCubit(this.repository, {DateTime Function()? clock})
+    : clock = clock ?? DateTime.now,
+      super(LessonLoading());
 
   Future<void> loadLessons({int? groupId}) async {
     final requestId = ++_requestId;
     try {
+      final now = clock();
+      await repository.generateUpcomingLessons(now);
       final lessons = await repository.getLessons(groupId: groupId);
+      if (!isClosed && requestId == _requestId) emit(LessonListLoaded(lessons));
+    } catch (error) {
+      if (!isClosed && requestId == _requestId) {
+        emit(LessonFailure(error.toString()));
+      }
+    }
+  }
+
+  Future<void> loadUpcomingLessons({required int groupId}) async {
+    final requestId = ++_requestId;
+    try {
+      final now = clock();
+      await repository.generateUpcomingLessons(now);
+      final lessons = await repository.getUpcomingLessons(
+        groupId: groupId,
+        from: now,
+      );
       if (!isClosed && requestId == _requestId) emit(LessonListLoaded(lessons));
     } catch (error) {
       if (!isClosed && requestId == _requestId) {

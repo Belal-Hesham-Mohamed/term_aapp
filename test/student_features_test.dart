@@ -49,6 +49,34 @@ void main() {
     expect(students.single.phone, '123');
   });
 
+  test('confirmed same-name and grade student gets an automatic display number', () async {
+    await repository.addStudent(makeStudent(name: 'Mona Ahmed'));
+    final cubit = StudentCubit(repository);
+    final created = await cubit.createStudent(
+      name: 'Mona Ahmed',
+      grade: '5',
+      phone: '777',
+      numberDuplicate: true,
+    );
+    expect(created?.name, 'Mona Ahmed (2)');
+    expect(created?.grade, '5');
+    expect(created?.phone, '777');
+    await cubit.close();
+  });
+
+  test('duplicate numbering chooses the next unused display number', () async {
+    await repository.addStudent(makeStudent(name: 'Mona Ahmed'));
+    await repository.addStudent(makeStudent(name: 'Mona Ahmed (2)'));
+    final cubit = StudentCubit(repository);
+    final created = await cubit.createStudent(
+      name: 'Mona Ahmed',
+      grade: '5',
+      numberDuplicate: true,
+    );
+    expect(created?.name, 'Mona Ahmed (3)');
+    await cubit.close();
+  });
+
   test(
     'updates student and can clear nullable values after SQLite reload',
     () async {
@@ -125,6 +153,8 @@ class _ControlledRepository implements StudentRepository {
       (searches[query] = Completer<List<Student>>()).future;
   @override
   Future<int> addStudent(Student student) async => 1;
+  @override
+  Future<List<Student>> findByNameAndGrade(String name, String grade) async => [];
   @override
   Future<int> updateStudent(Student student) async => 1;
   @override

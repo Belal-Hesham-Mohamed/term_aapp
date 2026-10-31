@@ -21,9 +21,20 @@ class GroupDetailsPage extends StatelessWidget {
   );
 }
 
-class _GroupDetailsView extends StatelessWidget {
+class _GroupDetailsView extends StatefulWidget {
   final int groupId;
   const _GroupDetailsView({required this.groupId});
+
+  @override
+  State<_GroupDetailsView> createState() => _GroupDetailsViewState();
+}
+
+class _GroupDetailsViewState extends State<_GroupDetailsView> {
+  int _scheduleRefreshKey = 0;
+
+  void _refreshUpcomingLessons() {
+    setState(() => _scheduleRefreshKey++);
+  }
 
   Future<void> _edit(BuildContext context, GroupDetailsLoaded state) async {
     final saved = await Navigator.push<bool>(
@@ -31,7 +42,7 @@ class _GroupDetailsView extends StatelessWidget {
       MaterialPageRoute(builder: (_) => GroupFormPage(group: state.group)),
     );
     if (saved == true && context.mounted) {
-      context.read<GroupCubit>().loadDetails(groupId);
+      context.read<GroupCubit>().loadDetails(widget.groupId);
     }
   }
 
@@ -39,11 +50,11 @@ class _GroupDetailsView extends StatelessWidget {
     final changed = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (_) => StudentEnrollmentPage(groupId: groupId),
+        builder: (_) => StudentEnrollmentPage(groupId: widget.groupId),
       ),
     );
     if (changed == true && context.mounted) {
-      context.read<GroupCubit>().loadDetails(groupId);
+      context.read<GroupCubit>().loadDetails(widget.groupId);
     }
   }
 
@@ -102,8 +113,14 @@ class _GroupDetailsView extends StatelessWidget {
                 title: Text(l10n.activeStudents),
                 subtitle: Text('${state.students.length}'),
               ),
-              GroupSchedulesSection(groupId: groupId),
-              GroupLessonsSection(groupId: groupId),
+              GroupSchedulesSection(
+                groupId: widget.groupId,
+                onSchedulesChanged: _refreshUpcomingLessons,
+              ),
+              GroupLessonsSection(
+                key: ValueKey(_scheduleRefreshKey),
+                groupId: widget.groupId,
+              ),
               const Divider(),
               if (state.students.isEmpty)
                 Padding(
@@ -144,7 +161,7 @@ class _GroupDetailsView extends StatelessWidget {
                         );
                         if (confirm == true && context.mounted) {
                           await context.read<GroupCubit>().removeStudent(
-                            groupId,
+                            widget.groupId,
                             student.id,
                           );
                         }

@@ -45,26 +45,30 @@ class Student {
       grade: grade ?? this.grade,
       phone: identical(phone, _notProvided) ? this.phone : phone as String?,
       age: identical(age, _notProvided) ? this.age : age as int?,
-      guardianPhone: identical(guardianPhone, _notProvided) ? this.guardianPhone : guardianPhone as String?,
+      guardianPhone: identical(guardianPhone, _notProvided)
+          ? this.guardianPhone
+          : guardianPhone as String?,
       notes: identical(notes, _notProvided) ? this.notes : notes as String?,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      archivedAt: identical(archivedAt, _notProvided) ? this.archivedAt : archivedAt as int?,
+      archivedAt: identical(archivedAt, _notProvided)
+          ? this.archivedAt
+          : archivedAt as int?,
     );
   }
 
   factory Student.fromMap(Map<String, dynamic> map) => Student(
-        id: map['id'] as int,
-        name: map['name'] as String,
-        grade: map['grade'] as String,
-        phone: map['phone'] as String?,
-        age: map['age'] as int?,
-        guardianPhone: map['guardian_phone'] as String?,
-        notes: map['notes'] as String?,
-        createdAt: map['created_at'] as int,
-        updatedAt: map['updated_at'] as int,
-        archivedAt: map['archived_at'] as int?,
-      );
+    id: map['id'] as int,
+    name: map['name'] as String,
+    grade: map['grade'] as String,
+    phone: map['phone'] as String?,
+    age: map['age'] as int?,
+    guardianPhone: map['guardian_phone'] as String?,
+    notes: map['notes'] as String?,
+    createdAt: map['created_at'] as int,
+    updatedAt: map['updated_at'] as int,
+    archivedAt: map['archived_at'] as int?,
+  );
 
   Map<String, dynamic> toMap() {
     return {

@@ -39,6 +39,15 @@
   "activeStudents": "Active students",
   "noEnrolledStudents": "No students are enrolled in this group.",
   "noAvailableStudents": "There are no students available to add.",
+  "addNewStudent": "Add New Student",
+  "firstName": "First name",
+  "fatherName": "Father's name",
+  "familyName": "Family name",
+  "duplicateStudentTitle": "Possible duplicate student",
+  "duplicateStudentMessage": "A student with this name and grade already exists: {names}. Review the existing student or confirm this is a different student.",
+  "@duplicateStudentMessage": {"placeholders": {"names": {}}},
+  "differentStudent": "This is a different student",
+  "studentCreatedEnrollmentFailed": "Student created, but could not be added to this group. Add the existing student from the enrollment list.",
   "addSelectedStudents": "Add selected students ({count})",
   "@addSelectedStudents": {"placeholders": {"count": {"type": "int"}}},
   "duplicateGroupName": "A group with this name already exists.",
@@ -99,6 +108,14 @@
   "saveAttendance": "Save attendance",
   "attendanceSaved": "Attendance saved.",
   "attendanceLoadFailed": "Could not load attendance. Please try again.",
-  "attendanceSaveFailed": "Could not save attendance. Your changes are still here; please try again."
+  "attendanceSaveFailed": "Could not save attendance. Your changes are still here; please try again.",
+  "weeklySchedule": "Weekly Schedule",
+  "addWeeklySchedule": "Add Weekly Schedule",
+  "editWeeklySchedule": "Edit Weekly Schedule",
+  "recurringWeeklyDescription": "This appointment repeats every week on the selected weekday.",
+  "upcomingLessons": "Upcoming Lessons",
+  "noUpcomingLessons": "No upcoming lessons in the next 30 days.",
+  "addExceptionalLesson": "Add Exceptional Lesson",
+  "exceptionalLessonDescription": "This creates a lesson on one date only and does not change the weekly schedule."
 }
 

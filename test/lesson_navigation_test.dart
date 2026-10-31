@@ -74,8 +74,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Physics').first);
     await tester.pumpAndSettle();
-    expect(find.text('Group schedules'), findsOneWidget);
-    expect(find.text('Group lessons'), findsOneWidget);
+    expect(find.text('Weekly Schedule'), findsOneWidget);
+    expect(find.text('Upcoming Lessons'), findsOneWidget);
     await tester.tap(find.textContaining('09:00').first);
     await tester.pumpAndSettle();
     expect(find.text('Lesson details'), findsOneWidget);
@@ -128,6 +128,13 @@ class _Lessons implements LessonRepository {
   _Lessons(this.lesson);
   @override
   Future<List<LessonRecord>> getLessons({int? groupId}) async => [lesson];
+  @override
+  Future<List<LessonRecord>> getUpcomingLessons({
+    int? groupId,
+    required DateTime from,
+  }) async => [lesson];
+  @override
+  Future<int> generateUpcomingLessons(DateTime now) async => 0;
   @override
   Future<LessonRecord> getLesson(int lessonId) async => lesson;
   @override

@@ -199,6 +199,284 @@ void main() {
     await cubit.close();
   });
 
+  test(
+    '30-day generation creates local Monday and Wednesday occurrences and is idempotent',
+    () async {
+      await schedules.createSchedule(
+        schedule(weekday: DateTime.monday, start: '16:00', end: '17:00'),
+      );
+      await schedules.createSchedule(
+        schedule(weekday: DateTime.wednesday, start: '16:30', end: '17:30'),
+      );
+      await schedules.createSchedule(
+        schedule(weekday: DateTime.friday, active: false),
+      );
+      final now = DateTime(2026, 3, 1, 13, 45);
+
+      final generated = await lessons.generateUpcomingLessons(now);
+      final rows = await lessons.getLessons(groupId: groupId);
+      final mondayDates = [
+        for (var day = 1; day < 31; day++)
+          if (DateTime(2026, 3, day).weekday == DateTime.monday)
+            DateTime(2026, 3, day),
+      ];
+      final wednesdayDates = [
+        for (var day = 1; day < 31; day++)
+          if (DateTime(2026, 3, day).weekday == DateTime.wednesday)
+            DateTime(2026, 3, day),
+      ];
+
+      expect(generated, mondayDates.length + wednesdayDates.length);
+      expect(rows, hasLength(generated));
+      expect(rows.every((row) => row.isManual == false), isTrue);
+      expect(
+        rows
+            .map(
+              (row) => DateTime.fromMillisecondsSinceEpoch(
+                row.scheduledDate,
+              ).weekday,
+            )
+            .toSet(),
+        {DateTime.monday, DateTime.wednesday},
+      );
+      expect(
+        rows.where((row) => row.startTime == '16:00'),
+        hasLength(mondayDates.length),
+      );
+      expect(
+        rows.where((row) => row.startTime == '16:30'),
+        hasLength(wednesdayDates.length),
+      );
+      expect(
+        rows.every(
+          (row) =>
+              DateTime.fromMillisecondsSinceEpoch(row.scheduledDate).hour == 0,
+        ),
+        isTrue,
+      );
+      expect(await lessons.generateUpcomingLessons(now), 0);
+      expect(await lessons.getLessons(groupId: groupId), hasLength(generated));
+    },
+  );
+
+  test(
+    'generation preserves existing manual and canceled generated lesson rows',
+    () async {
+      final monday = DateTime(2026, 3, 2).millisecondsSinceEpoch;
+      final nextMonday = DateTime(2026, 3, 9).millisecondsSinceEpoch;
+      await schedules.createSchedule(schedule(weekday: DateTime.monday));
+      await database.db.insert('lessons', {
+        'group_id': groupId,
+        'scheduled_date': monday,
+        'start_time': '09:00',
+        'end_time': '10:00',
+        'is_manual': 1,
+        'is_canceled': 1,
+        'cancellation_reason': 'One-off canceled lesson',
+      });
+      final canceledGeneratedId = await database.db.insert('lessons', {
+        'group_id': groupId,
+        'scheduled_date': nextMonday,
+        'start_time': '09:00',
+        'end_time': '10:00',
+        'is_manual': 0,
+        'is_canceled': 1,
+        'cancellation_reason': 'Preserve canceled generated lesson',
+      });
+      final studentId = await addStudent('Attendance history');
+      await database.db.insert('attendance_records', {
+        'lesson_id': canceledGeneratedId,
+        'student_id': studentId,
+        'status': 'present',
+        'recorded_at': DateTime(2026, 3, 9).millisecondsSinceEpoch,
+      });
+
+      await lessons.generateUpcomingLessons(DateTime(2026, 3, 1));
+      final manual = await database.db.query(
+        'lessons',
+        where: 'scheduled_date = ?',
+        whereArgs: [monday],
+      );
+      final generated = await database.db.query(
+        'lessons',
+        where: 'scheduled_date = ?',
+        whereArgs: [nextMonday],
+      );
+      expect(manual, hasLength(1));
+      expect(manual.single['is_manual'], 1);
+      expect(manual.single['cancellation_reason'], 'One-off canceled lesson');
+      expect(generated, hasLength(1));
+      expect(generated.single['is_canceled'], 1);
+      expect(
+        generated.single['cancellation_reason'],
+        'Preserve canceled generated lesson',
+      );
+      expect(
+        await database.db.query(
+          'attendance_records',
+          where: 'lesson_id = ?',
+          whereArgs: [canceledGeneratedId],
+        ),
+        hasLength(1),
+      );
+    },
+  );
+
+  test(
+    'schedule edits add new occurrences without rewriting or deleting old ones',
+    () async {
+      final scheduleId = await schedules.createSchedule(
+        schedule(weekday: DateTime.monday, start: '09:00', end: '10:00'),
+      );
+      final now = DateTime(2026, 3, 1);
+      final mondayCount = await lessons.generateUpcomingLessons(now);
+      final mondayRowsBefore = await database.db.query(
+        'lessons',
+        where: 'group_id = ? AND start_time = ?',
+        whereArgs: [groupId, '09:00'],
+      );
+
+      await schedules.updateSchedule(
+        schedule(
+          id: scheduleId,
+          weekday: DateTime.wednesday,
+          start: '11:00',
+          end: '12:00',
+        ),
+      );
+      final newOccurrences = await lessons.generateUpcomingLessons(now);
+      expect(newOccurrences, greaterThan(0));
+      final mondayRowsAfter = await database.db.query(
+        'lessons',
+        where: 'group_id = ? AND start_time = ?',
+        whereArgs: [groupId, '09:00'],
+      );
+      expect(mondayRowsAfter, hasLength(mondayRowsBefore.length));
+      expect(await lessons.generateUpcomingLessons(now), 0);
+
+      await schedules.updateSchedule(
+        schedule(
+          id: scheduleId,
+          weekday: DateTime.wednesday,
+          start: '11:00',
+          end: '12:00',
+          active: false,
+        ),
+      );
+      expect(await lessons.generateUpcomingLessons(now), 0);
+      expect(
+        await database.db.query('lessons'),
+        hasLength(mondayCount + newOccurrences),
+      );
+    },
+  );
+
+  test(
+    'schedule deactivation and removal preserve historical lesson and attendance',
+    () async {
+      final studentId = await addStudent('Historical student');
+      final pastLesson = await lessons.createLesson(
+        lesson(date: DateTime(2025, 1, 6).millisecondsSinceEpoch),
+      );
+      await database.db.insert('attendance_records', {
+        'lesson_id': pastLesson,
+        'student_id': studentId,
+        'status': 'present',
+        'recorded_at': DateTime(2025, 1, 6).millisecondsSinceEpoch,
+      });
+      final scheduleId = await schedules.createSchedule(schedule());
+      final beforeLesson = await lessons.getLesson(pastLesson);
+      await lessons.generateUpcomingLessons(DateTime(2026, 3, 1));
+      await schedules.updateSchedule(schedule(id: scheduleId, active: false));
+      await schedules.removeSchedule(scheduleId);
+      final afterLesson = await lessons.getLesson(pastLesson);
+      final attendanceRows = await database.db.query(
+        'attendance_records',
+        where: 'lesson_id = ?',
+        whereArgs: [pastLesson],
+      );
+      expect(afterLesson.scheduledDate, beforeLesson.scheduledDate);
+      expect(afterLesson.isCanceled, beforeLesson.isCanceled);
+      expect(attendanceRows, hasLength(1));
+      expect(attendanceRows.single['status'], 'present');
+    },
+  );
+
+  test(
+    'upcoming query orders nearest first and includes canceled lessons',
+    () async {
+      final passedToday = await lessons.createLesson(
+        lesson(
+          date: DateTime(2026, 3, 1).millisecondsSinceEpoch,
+          start: '17:00',
+          end: '18:00',
+        ),
+      );
+      final laterToday = await lessons.createLesson(
+        lesson(
+          date: DateTime(2026, 3, 1).millisecondsSinceEpoch,
+          start: '19:00',
+          end: '20:00',
+        ),
+      );
+      final later = await lessons.createLesson(
+        lesson(
+          date: DateTime(2026, 3, 8).millisecondsSinceEpoch,
+          start: '11:00',
+        ),
+      );
+      final nearest = await lessons.createLesson(
+        lesson(
+          date: DateTime(2026, 3, 3).millisecondsSinceEpoch,
+          start: '09:00',
+        ),
+      );
+      await database.db.update(
+        'lessons',
+        {'is_canceled': 1},
+        where: 'id = ?',
+        whereArgs: [nearest],
+      );
+      await lessons.createLesson(
+        lesson(date: DateTime(2026, 2, 28).millisecondsSinceEpoch),
+      );
+      final result = await lessons.getUpcomingLessons(
+        groupId: groupId,
+        from: DateTime(2026, 3, 1, 18),
+      );
+      expect(result.map((item) => item.id).toList(), [
+        laterToday,
+        nearest,
+        later,
+      ]);
+      expect(result.first.id, isNot(passedToday));
+      expect(result[1].isCanceled, isTrue);
+    },
+  );
+
+  test('exceptional lesson creation does not alter weekly schedules', () async {
+    await schedules.createSchedule(schedule(weekday: DateTime.monday));
+    final scheduleRowsBefore = await schedules.getSchedules(groupId);
+    final exceptional = lesson(
+      date: DateTime(2026, 3, 5).millisecondsSinceEpoch,
+    );
+    await lessons.createLesson(exceptional);
+    final saved = (await lessons.getLessons()).single;
+    expect(saved.isManual, isTrue);
+    final scheduleRowsAfter = await schedules.getSchedules(groupId);
+    expect(scheduleRowsAfter, hasLength(scheduleRowsBefore.length));
+    expect(scheduleRowsAfter.single.groupId, scheduleRowsBefore.single.groupId);
+    expect(scheduleRowsAfter.single.weekday, scheduleRowsBefore.single.weekday);
+    expect(
+      scheduleRowsAfter.single.startTime,
+      scheduleRowsBefore.single.startTime,
+    );
+    expect(
+      scheduleRowsAfter.single.endTime,
+      scheduleRowsBefore.single.endTime,
+    );
+  });
+
   test('attendance transaction rolls back if a status is invalid', () async {
     final studentId = await addStudent('Rami');
     final lessonId = await lessons.createLesson(lesson());

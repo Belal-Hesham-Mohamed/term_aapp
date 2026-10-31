@@ -16,7 +16,7 @@ class GroupLessonsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-    create: (_) => getIt<LessonCubit>()..loadLessons(groupId: groupId),
+    create: (_) => getIt<LessonCubit>()..loadUpcomingLessons(groupId: groupId),
     child: _GroupLessonPreview(groupId: groupId),
   );
 }
@@ -33,20 +33,22 @@ class _GroupLessonPreview extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ListTile(
-            title: Text(l10n.groupLessons),
+            title: Text(l10n.upcomingLessons),
             trailing: Wrap(
               children: [
                 IconButton(
-                  tooltip: l10n.createLesson,
+                  tooltip: l10n.addExceptionalLesson,
                   onPressed: () async {
-                    await Navigator.push<bool>(
+                    final saved = await Navigator.push<bool>(
                       context,
                       MaterialPageRoute(
                         builder: (_) => LessonFormPage(groupId: groupId),
                       ),
                     );
-                    if (context.mounted) {
-                      context.read<LessonCubit>().loadLessons(groupId: groupId);
+                    if (saved == true && context.mounted) {
+                      context.read<LessonCubit>().loadUpcomingLessons(
+                        groupId: groupId,
+                      );
                     }
                   },
                   icon: const Icon(Icons.add),
@@ -60,7 +62,9 @@ class _GroupLessonPreview extends StatelessWidget {
                       ),
                     );
                     if (context.mounted) {
-                      context.read<LessonCubit>().loadLessons(groupId: groupId);
+                      context.read<LessonCubit>().loadUpcomingLessons(
+                        groupId: groupId,
+                      );
                     }
                   },
                   child: Text(l10n.viewAll),
@@ -78,7 +82,7 @@ class _GroupLessonPreview extends StatelessWidget {
           else if (state is LessonListLoaded && state.lessons.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(l10n.noLessons),
+              child: Text(l10n.noUpcomingLessons),
             )
           else if (state is LessonListLoaded)
             ...state.lessons
@@ -87,19 +91,27 @@ class _GroupLessonPreview extends StatelessWidget {
                   (lesson) => ListTile(
                     dense: true,
                     title: Text(
-                      '${DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag()).format(DateTime.fromMillisecondsSinceEpoch(lesson.scheduledDate))} | ${lesson.startTime ?? ''}',
+                      '${DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag()).format(DateTime.fromMillisecondsSinceEpoch(lesson.scheduledDate))} | ${lesson.startTime ?? ''} - ${lesson.endTime ?? ''}',
                     ),
                     subtitle: Text(
                       lesson.isCanceled
                           ? l10n.lessonCanceled
                           : l10n.lessonScheduled,
                     ),
-                    onTap: () => Navigator.push<void>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => LessonDetailsPage(lessonId: lesson.id),
-                      ),
-                    ),
+                    onTap: () async {
+                      await Navigator.push<void>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              LessonDetailsPage(lessonId: lesson.id),
+                        ),
+                      );
+                      if (context.mounted) {
+                        context.read<LessonCubit>().loadUpcomingLessons(
+                          groupId: groupId,
+                        );
+                      }
+                    },
                   ),
                 ),
         ],

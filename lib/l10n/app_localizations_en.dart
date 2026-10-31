@@ -126,6 +126,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noAvailableStudents => 'There are no students available to add.';
 
   @override
+  String get addNewStudent => 'Add New Student';
+
+  @override
+  String get firstName => 'First name';
+
+  @override
+  String get fatherName => 'Father\'s name';
+
+  @override
+  String get familyName => 'Family name';
+
+  @override
+  String get duplicateStudentTitle => 'Possible duplicate student';
+
+  @override
+  String duplicateStudentMessage(Object names) {
+    return 'A student with this name and grade already exists: $names. Review the existing student or confirm this is a different student.';
+  }
+
+  @override
+  String get differentStudent => 'This is a different student';
+
+  @override
+  String get studentCreatedEnrollmentFailed =>
+      'Student created, but could not be added to this group. Add the existing student from the enrollment list.';
+
+  @override
   String addSelectedStudents(int count) {
     return 'Add selected students ($count)';
   }
@@ -316,4 +343,30 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get attendanceSaveFailed =>
       'Could not save attendance. Your changes are still here; please try again.';
+
+  @override
+  String get weeklySchedule => 'Weekly Schedule';
+
+  @override
+  String get addWeeklySchedule => 'Add Weekly Schedule';
+
+  @override
+  String get editWeeklySchedule => 'Edit Weekly Schedule';
+
+  @override
+  String get recurringWeeklyDescription =>
+      'This appointment repeats every week on the selected weekday.';
+
+  @override
+  String get upcomingLessons => 'Upcoming Lessons';
+
+  @override
+  String get noUpcomingLessons => 'No upcoming lessons in the next 30 days.';
+
+  @override
+  String get addExceptionalLesson => 'Add Exceptional Lesson';
+
+  @override
+  String get exceptionalLessonDescription =>
+      'This creates a lesson on one date only and does not change the weekly schedule.';
 }

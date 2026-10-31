@@ -39,7 +39,7 @@ class _SchedulesView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.groupSchedules)),
+      appBar: AppBar(title: Text(l10n.weeklySchedule)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _form(context),
         child: const Icon(Icons.add),

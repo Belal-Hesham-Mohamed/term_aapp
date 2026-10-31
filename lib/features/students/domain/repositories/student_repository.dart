@@ -6,6 +6,7 @@ abstract class StudentRepository {
   Future<List<Student>> getActiveStudents();
   Future<List<Student>> searchStudents(String query);
   Future<int> addStudent(Student student);
+  Future<List<Student>> findByNameAndGrade(String name, String grade);
   Future<int> updateStudent(Student student);
   Future<int> archiveStudent(int id);
 }

@@ -17,9 +17,7 @@ class StudentListPage extends StatelessWidget {
     return BlocProvider<StudentCubit>(
       create: (_) => getIt<StudentCubit>(),
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.students),
-        ),
+        appBar: AppBar(title: Text(l10n.students)),
         floatingActionButton: Builder(
           builder: (context) => FloatingActionButton(
             onPressed: () async {
@@ -86,7 +84,9 @@ class _StudentListBodyState extends State<_StudentListBody> {
                 final students = state.students;
                 if (students.isEmpty) {
                   return Center(
-                    child: Text(_query.isEmpty ? l10n.noStudents : l10n.noResults),
+                    child: Text(
+                      _query.isEmpty ? l10n.noStudents : l10n.noResults,
+                    ),
                   );
                 }
                 return ListView.builder(
@@ -95,11 +95,15 @@ class _StudentListBodyState extends State<_StudentListBody> {
                     final student = students[index];
                     return ListTile(
                       title: Text(student.name),
-                      subtitle: Text('${l10n.grade}: ${student.grade}${student.phone != null && student.phone!.isNotEmpty ? ' • ${student.phone}' : ''}'),
+                      subtitle: Text(
+                        '${l10n.grade}: ${student.grade}${student.phone != null && student.phone!.isNotEmpty ? ' • ${student.phone}' : ''}',
+                      ),
                       onTap: () async {
                         final result = await Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => StudentFormPage(student: student)),
+                          MaterialPageRoute(
+                            builder: (_) => StudentFormPage(student: student),
+                          ),
                         );
                         if (result == true && context.mounted) {
                           context.read<StudentCubit>().loadStudents();
@@ -114,13 +118,21 @@ class _StudentListBodyState extends State<_StudentListBody> {
                               title: Text(l10n.archive),
                               content: Text(l10n.archiveConfirm),
                               actions: [
-                                TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-                                TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.archive)),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: Text(l10n.cancel),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: Text(l10n.archive),
+                                ),
                               ],
                             ),
                           );
                           if (confirm == true && context.mounted) {
-                            await context.read<StudentCubit>().archiveStudent(student.id);
+                            await context.read<StudentCubit>().archiveStudent(
+                              student.id,
+                            );
                           }
                         },
                       ),

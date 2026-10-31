@@ -26,7 +26,9 @@ class StudentCubit extends Cubit<StudentState> {
           : await repository.searchStudents(query);
       if (!isClosed && requestId == _requestId) emit(StudentLoaded(students));
     } catch (e) {
-      if (!isClosed && requestId == _requestId) emit(StudentError(e.toString()));
+      if (!isClosed && requestId == _requestId) {
+        emit(StudentError(e.toString()));
+      }
     }
   }
 
@@ -51,7 +53,9 @@ class StudentCubit extends Cubit<StudentState> {
           : await repository.searchStudents(query);
       if (!isClosed && requestId == _requestId) emit(StudentLoaded(students));
     } catch (e) {
-      if (!isClosed && requestId == _requestId) emit(StudentError(e.toString()));
+      if (!isClosed && requestId == _requestId) {
+        emit(StudentError(e.toString()));
+      }
     }
   }
 
@@ -63,11 +67,33 @@ class StudentCubit extends Cubit<StudentState> {
     String? guardianPhone,
     String? notes,
   }) async {
+    return await createStudent(name: name, grade: grade, phone: phone, age: age,
+      guardianPhone: guardianPhone, notes: notes) != null;
+  }
+
+  Future<Student?> createStudent({
+    required String name,
+    required String grade,
+    String? phone,
+    int? age,
+    String? guardianPhone,
+    String? notes,
+    bool numberDuplicate = false,
+  }) async {
     try {
+      var finalName = name.trim();
+      if (numberDuplicate) {
+        final duplicates = await repository.findByNameAndGrade(finalName, grade);
+        if (duplicates.isNotEmpty) {
+          var index = 2;
+          while ((await repository.findByNameAndGrade('$finalName ($index)', grade)).isNotEmpty) { index++; }
+          finalName = '$finalName ($index)';
+        }
+      }
       final now = DateTime.now().millisecondsSinceEpoch;
       final student = Student(
         id: 0,
-        name: name,
+        name: finalName,
         grade: grade,
         phone: phone?.isEmpty == true ? null : phone,
         age: age,
@@ -76,18 +102,20 @@ class StudentCubit extends Cubit<StudentState> {
         createdAt: now,
         updatedAt: now,
       );
-      await repository.addStudent(student);
+      final id = await repository.addStudent(student);
       await loadStudents();
-      return true;
+      return student.copyWith(id: id);
     } catch (e) {
       emit(StudentError(e.toString()));
-      return false;
+      return null;
     }
   }
 
   Future<bool> updateStudent(Student student) async {
     try {
-      final updated = student.copyWith(updatedAt: DateTime.now().millisecondsSinceEpoch);
+      final updated = student.copyWith(
+        updatedAt: DateTime.now().millisecondsSinceEpoch,
+      );
       await repository.updateStudent(updated);
       await loadStudents();
       return true;

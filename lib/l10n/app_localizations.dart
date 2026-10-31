@@ -326,6 +326,54 @@ abstract class AppLocalizations {
   /// **'There are no students available to add.'**
   String get noAvailableStudents;
 
+  /// No description provided for @addNewStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Student'**
+  String get addNewStudent;
+
+  /// No description provided for @firstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get firstName;
+
+  /// No description provided for @fatherName.
+  ///
+  /// In en, this message translates to:
+  /// **'Father\'s name'**
+  String get fatherName;
+
+  /// No description provided for @familyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Family name'**
+  String get familyName;
+
+  /// No description provided for @duplicateStudentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible duplicate student'**
+  String get duplicateStudentTitle;
+
+  /// No description provided for @duplicateStudentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A student with this name and grade already exists: {names}. Review the existing student or confirm this is a different student.'**
+  String duplicateStudentMessage(Object names);
+
+  /// No description provided for @differentStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a different student'**
+  String get differentStudent;
+
+  /// No description provided for @studentCreatedEnrollmentFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Student created, but could not be added to this group. Add the existing student from the enrollment list.'**
+  String get studentCreatedEnrollmentFailed;
+
   /// No description provided for @addSelectedStudents.
   ///
   /// In en, this message translates to:
@@ -685,6 +733,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not save attendance. Your changes are still here; please try again.'**
   String get attendanceSaveFailed;
+
+  /// No description provided for @weeklySchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Schedule'**
+  String get weeklySchedule;
+
+  /// No description provided for @addWeeklySchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Weekly Schedule'**
+  String get addWeeklySchedule;
+
+  /// No description provided for @editWeeklySchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Weekly Schedule'**
+  String get editWeeklySchedule;
+
+  /// No description provided for @recurringWeeklyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This appointment repeats every week on the selected weekday.'**
+  String get recurringWeeklyDescription;
+
+  /// No description provided for @upcomingLessons.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Lessons'**
+  String get upcomingLessons;
+
+  /// No description provided for @noUpcomingLessons.
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming lessons in the next 30 days.'**
+  String get noUpcomingLessons;
+
+  /// No description provided for @addExceptionalLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Exceptional Lesson'**
+  String get addExceptionalLesson;
+
+  /// No description provided for @exceptionalLessonDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This creates a lesson on one date only and does not change the weekly schedule.'**
+  String get exceptionalLessonDescription;
 }
 
 class _AppLocalizationsDelegate

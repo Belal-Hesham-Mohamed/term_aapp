@@ -6,21 +6,31 @@ import '../../../../l10n/app_localizations.dart';
 import '../cubit/schedule_cubit.dart';
 import '../state/schedule_state.dart';
 import 'group_schedules_page.dart';
+import 'schedule_form_page.dart';
 
 class GroupSchedulesSection extends StatelessWidget {
   final int groupId;
-  const GroupSchedulesSection({super.key, required this.groupId});
+  final VoidCallback? onSchedulesChanged;
+  const GroupSchedulesSection({
+    super.key,
+    required this.groupId,
+    this.onSchedulesChanged,
+  });
 
   @override
   Widget build(BuildContext context) => BlocProvider(
     create: (_) => getIt<ScheduleCubit>()..loadSchedules(groupId),
-    child: _SchedulePreview(groupId: groupId),
+    child: _SchedulePreview(
+      groupId: groupId,
+      onSchedulesChanged: onSchedulesChanged,
+    ),
   );
 }
 
 class _SchedulePreview extends StatelessWidget {
   final int groupId;
-  const _SchedulePreview({required this.groupId});
+  final VoidCallback? onSchedulesChanged;
+  const _SchedulePreview({required this.groupId, this.onSchedulesChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -31,20 +41,41 @@ class _SchedulePreview extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ListTile(
-              title: Text(l10n.groupSchedules),
-              trailing: TextButton(
-                onPressed: () async {
-                  await Navigator.push<void>(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => GroupSchedulesPage(groupId: groupId),
-                    ),
-                  );
-                  if (context.mounted) {
-                    context.read<ScheduleCubit>().loadSchedules(groupId);
-                  }
-                },
-                child: Text(l10n.manage),
+              title: Text(l10n.weeklySchedule),
+              trailing: Wrap(
+                children: [
+                  IconButton(
+                    tooltip: l10n.addWeeklySchedule,
+                    icon: const Icon(Icons.add),
+                    onPressed: () async {
+                      final saved = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ScheduleFormPage(groupId: groupId),
+                        ),
+                      );
+                      if (context.mounted) {
+                        context.read<ScheduleCubit>().loadSchedules(groupId);
+                        if (saved == true) onSchedulesChanged?.call();
+                      }
+                    },
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await Navigator.push<void>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => GroupSchedulesPage(groupId: groupId),
+                        ),
+                      );
+                      if (context.mounted) {
+                        context.read<ScheduleCubit>().loadSchedules(groupId);
+                        onSchedulesChanged?.call();
+                      }
+                    },
+                    child: Text(l10n.manage),
+                  ),
+                ],
               ),
             ),
             if (state is ScheduleLoading)

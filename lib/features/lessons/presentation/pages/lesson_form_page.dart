@@ -166,7 +166,7 @@ class _LessonFormPageState extends State<LessonFormPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            widget.lesson == null ? l10n.createLesson : l10n.editLesson,
+            widget.lesson == null ? l10n.addExceptionalLesson : l10n.editLesson,
           ),
         ),
         body: SingleChildScrollView(
@@ -175,6 +175,14 @@ class _LessonFormPageState extends State<LessonFormPage> {
             key: _formKey,
             child: Column(
               children: [
+                if (widget.lesson == null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(l10n.exceptionalLessonDescription),
+                    ),
+                  ),
                 if (widget.groupId == null && widget.lesson == null)
                   _loadingGroups
                       ? const LinearProgressIndicator()
