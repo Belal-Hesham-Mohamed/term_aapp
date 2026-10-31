@@ -47,7 +47,7 @@
   "duplicateStudentMessage": "يوجد طالب بهذا الاسم والصف بالفعل: {names}. راجع الطالب الحالي أو أكد أن هذا طالب مختلف.",
   "@duplicateStudentMessage": {"placeholders": {"names": {}}},
   "differentStudent": "هذا طالب مختلف",
-  "studentCreatedEnrollmentFailed": "تم إنشاء الطالب، لكن تعذرت إضافته إلى المجموعة. أضف الطالب من قائمة التسجيل.",
+  "studentCreatedEnrollmentFailed": "تم حفظ الطالب، لكن تعذر تسجيله بالمجموعة. أعد محاولة التسجيل دون إنشاء طالب آخر.",
   "invalidPhone": "أدخل رقم هاتف محمول مصرياً صحيحاً.",
   "ageOutOfRange": "يجب أن يكون العمر بين 4 و30 عاماً.",
   "gradePrimary1": "الصف الأول الابتدائي", "gradePrimary2": "الصف الثاني الابتدائي", "gradePrimary3": "الصف الثالث الابتدائي", "gradePrimary4": "الصف الرابع الابتدائي", "gradePrimary5": "الصف الخامس الابتدائي", "gradePrimary6": "الصف السادس الابتدائي",
@@ -124,6 +124,11 @@
   "upcomingLessons": "الحصص القادمة",
   "noUpcomingLessons": "لا توجد حصص قادمة خلال الثلاثين يوماً المقبلة.",
   "addExceptionalLesson": "إضافة حصة استثنائية",
-  "exceptionalLessonDescription": "تُنشأ الحصة لهذا التاريخ فقط ولا تغيّر الجدول الأسبوعي."
+  "exceptionalLessonDescription": "تُنشأ الحصة لهذا التاريخ فقط ولا تغيّر الجدول الأسبوعي.",
+  "legacyStudentNameRetained": "الاسم القديم: {name}. سيبقى كما هو ما لم تُدخل أجزاء الاسم الثلاثة.",
+  "@legacyStudentNameRetained": { "placeholders": { "name": { "type": "String" } } },
+  "openExistingStudentPrompt": "هل تريد فتح سجل الطالب الموجود؟",
+  "openExistingStudent": "فتح سجل الطالب",
+  "retryEnrollment": "إعادة محاولة التسجيل"
 }
 

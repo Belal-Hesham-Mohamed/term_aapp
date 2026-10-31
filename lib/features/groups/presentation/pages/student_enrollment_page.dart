@@ -35,7 +35,7 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
   }
 
   Future<void> _add() async {
-    if (_saving) return;
+    if (_saving || _selected.isEmpty) return;
     setState(() => _saving = true);
     final success = await _cubit.addStudents(
       widget.groupId,
@@ -53,20 +53,55 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
         builder: (_) => StudentFormPage(enrollInGroupId: widget.groupId),
       ),
     );
-    if (result is StudentCreationResult && result.created && mounted) {
+    if (result is StudentCreationResult && mounted) {
       await _cubit.loadAvailableStudents(widget.groupId);
       if (result.enrolled && mounted) {
         Navigator.pop(context, true);
-      } else if (mounted) {
+      } else if (result.studentId != null &&
+          _cubit.state is GroupAvailableStudentsLoaded &&
+          (_cubit.state as GroupAvailableStudentsLoaded).students.any(
+            (student) => student.id == result.studentId,
+          )) {
+        setState(() => _selected.add(result.studentId!));
+        if (result.created && mounted) _showEnrollmentRetry(result.studentId!);
+      } else if (result.created && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               AppLocalizations.of(context)!.studentCreatedEnrollmentFailed,
             ),
+            action: result.studentId == null
+                ? null
+                : SnackBarAction(
+                    label: AppLocalizations.of(context)!.retryEnrollment,
+                    onPressed: () => _retryEnrollment(result.studentId!),
+                  ),
           ),
         );
       }
     }
+  }
+
+  void _showEnrollmentRetry(int studentId) {
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.studentCreatedEnrollmentFailed),
+        action: SnackBarAction(
+          label: l10n.retryEnrollment,
+          onPressed: () => _retryEnrollment(studentId),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _retryEnrollment(int studentId) async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    final success = await _cubit.addStudents(widget.groupId, [studentId]);
+    if (!mounted) return;
+    setState(() => _saving = false);
+    if (success) Navigator.pop(context, true);
   }
 
   @override
@@ -116,7 +151,7 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: ElevatedButton(
-              onPressed: _saving ? null : _add,
+              onPressed: _saving || _selected.isEmpty ? null : _add,
               child: Text(
                 _saving
                     ? l10n.saving

@@ -33,7 +33,7 @@ void main() {
       );
     }
     expect(StudentRules.normalizePhone(' 010 1234-5678 '), '+201012345678');
-    expect(StudentRules.normalizePhone(' -  '), '');
+    expect(() => StudentRules.normalizePhone(' -  '), throwsFormatException);
     expect(StudentRules.normalizePhone('   '), '');
   });
 
@@ -75,5 +75,16 @@ void main() {
     expect(StudentRules.normalizeNamePart('  Mona   Ali '), 'Mona Ali');
     expect(StudentRules.normalizeName('  MONA   Ali '), 'mona ali');
     expect(StudentRules.normalizeNamePart('أحمد'), 'أحمد');
+  });
+
+  test('normalizes all name parts with the same whitespace rule', () {
+    expect(
+      StudentRules.normalizeNameParts(
+        firstName: ' Mona  ',
+        fatherName: ' Ali   Hassan ',
+        familyName: ' Ahmed ',
+      ),
+      ['Mona', 'Ali Hassan', 'Ahmed'],
+    );
   });
 }

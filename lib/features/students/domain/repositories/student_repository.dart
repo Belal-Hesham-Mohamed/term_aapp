@@ -4,6 +4,7 @@ import '../entities/student.dart';
 
 abstract class StudentRepository {
   Future<List<Student>> getActiveStudents();
+  Future<Student?> getStudentById(int id);
   Future<List<Student>> searchStudents(String query);
   Future<int> addStudent(Student student);
   Future<List<Student>> findByNameAndGrade(String name, String grade);

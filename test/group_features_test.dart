@@ -147,15 +147,43 @@ void main() {
       final activeB = await addStudent('B');
       final archived = await addStudent('C', archived: true);
       expect(await repository.getAvailableStudents(group), hasLength(2));
-      await repository.addStudents(group, [
-        activeA,
-        activeB,
-        activeA,
-        archived,
-      ]);
+      await repository.addStudents(group, [activeA, activeB, activeA]);
+      await expectLater(
+        repository.addStudents(group, [archived]),
+        throwsStateError,
+      );
       expect(await repository.getEnrolledStudents(group), hasLength(2));
       expect((await repository.getGroup(group)).activeStudentCount, 2);
       expect(await repository.getAvailableStudents(group), isEmpty);
+    },
+  );
+
+  test(
+    'keeps a created student after failed enrollment and allows safe retry',
+    () async {
+      final group = await addGroup('Retry group');
+      final student = await addStudent('Saved student', archived: true);
+      await expectLater(
+        repository.addStudents(group, [student]),
+        throwsStateError,
+      );
+      expect(
+        await database.db.query(
+          'students',
+          where: 'id = ?',
+          whereArgs: [student],
+        ),
+        hasLength(1),
+      );
+      await database.db.update(
+        'students',
+        {'archived_at': null},
+        where: 'id = ?',
+        whereArgs: [student],
+      );
+      await repository.addStudents(group, [student]);
+      await repository.addStudents(group, [student]);
+      expect(await repository.getEnrolledStudents(group), hasLength(1));
     },
   );
 

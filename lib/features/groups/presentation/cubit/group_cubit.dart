@@ -120,7 +120,7 @@ class GroupCubit extends Cubit<GroupState> {
 
   Future<bool> addStudents(int groupId, List<int> studentIds) async {
     try {
-      if (studentIds.isEmpty) return true;
+      if (studentIds.isEmpty) return false;
       await repository.addStudents(groupId, studentIds);
       await loadDetails(groupId);
       return true;

@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @studentCreatedEnrollmentFailed.
   ///
   /// In en, this message translates to:
-  /// **'Student created, but could not be added to this group. Add the existing student from the enrollment list.'**
+  /// **'Student saved, but enrollment failed. Retry enrollment without creating another student.'**
   String get studentCreatedEnrollmentFailed;
 
   /// No description provided for @invalidPhone.
@@ -889,6 +889,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This creates a lesson on one date only and does not change the weekly schedule.'**
   String get exceptionalLessonDescription;
+
+  /// No description provided for @legacyStudentNameRetained.
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy name: {name}. It will be kept unless you enter all three name parts.'**
+  String legacyStudentNameRetained(String name);
+
+  /// No description provided for @openExistingStudentPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to open the existing student\'s record?'**
+  String get openExistingStudentPrompt;
+
+  /// No description provided for @openExistingStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Open student'**
+  String get openExistingStudent;
+
+  /// No description provided for @retryEnrollment.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry enrollment'**
+  String get retryEnrollment;
 }
 
 class _AppLocalizationsDelegate

@@ -75,15 +75,14 @@ class StudentCubit extends Cubit<StudentState> {
       final first = StudentRules.normalizeNamePart(firstName);
       final father = StudentRules.normalizeNamePart(fatherName);
       final family = StudentRules.normalizeNamePart(familyName);
-      if ([first, father, family].any((part) => part.isEmpty) ||
-          !StudentRules.gradeIds.contains(grade)) {
+      final parts = [first, father, family];
+      if (parts.any((part) => part.isEmpty) ||
+          !StudentRules.isSupportedGrade(grade)) {
         return null;
       }
       final cleanPhone = StudentRules.normalizePhone(phone ?? '');
       final cleanGuardian = StudentRules.normalizePhone(guardianPhone ?? '');
-      final cleanAge = age == null
-          ? null
-          : StudentRules.parseAge(age.toString());
+      final cleanAge = StudentRules.validateAge(age);
       final name = [first, father, family].join(' ');
       final duplicates = await repository.findPotentialDuplicates(
         firstName: first,
@@ -104,13 +103,14 @@ class StudentCubit extends Cubit<StudentState> {
         phone: cleanPhone.isEmpty ? null : cleanPhone,
         age: cleanAge,
         guardianPhone: cleanGuardian.isEmpty ? null : cleanGuardian,
-        notes: notes?.isEmpty == true ? null : notes,
+        notes: notes?.trim().isEmpty == true ? null : notes?.trim(),
         createdAt: now,
         updatedAt: now,
       );
       final id = await repository.addStudent(student);
+      final persisted = await repository.getStudentById(id);
       await loadStudents();
-      return student.copyWith(id: id);
+      return persisted ?? student.copyWith(id: id);
     } catch (e) {
       emit(StudentError(e.toString()));
       return null;
@@ -131,32 +131,44 @@ class StudentCubit extends Cubit<StudentState> {
 
   Future<bool> updateStudent(Student student) async {
     try {
+      final existing = await repository.getStudentById(student.id);
+      if (existing == null) return false;
       final first = StudentRules.normalizeNamePart(student.firstName ?? '');
       final father = StudentRules.normalizeNamePart(student.fatherName ?? '');
       final family = StudentRules.normalizeNamePart(student.familyName ?? '');
-      if ([first, father, family].any((part) => part.isEmpty)) return false;
-      if (StudentRules.gradeIds.contains(student.grade) == false &&
-          student.grade.trim().isEmpty) {
+      final parts = [first, father, family];
+      final legacyName =
+          existing.firstName == null &&
+          existing.fatherName == null &&
+          existing.familyName == null;
+      final preserveLegacyName =
+          legacyName && parts.every((part) => part.isEmpty);
+      if (!preserveLegacyName) StudentRules.validateNameParts(parts);
+      final grade = student.grade.trim();
+      if (grade.isEmpty ||
+          (grade != existing.grade && !StudentRules.isSupportedGrade(grade))) {
         return false;
       }
       final phone = StudentRules.normalizePhone(student.phone ?? '');
       final guardian = StudentRules.normalizePhone(student.guardianPhone ?? '');
-      final age = student.age == null
-          ? null
-          : StudentRules.parseAge(student.age.toString());
+      final age = StudentRules.validateAge(student.age);
       final updated = student.copyWith(
-        name: '$first $father $family',
-        firstName: first,
-        fatherName: father,
-        familyName: family,
+        name: preserveLegacyName ? existing.name : parts.join(' '),
+        firstName: preserveLegacyName ? null : first,
+        fatherName: preserveLegacyName ? null : father,
+        familyName: preserveLegacyName ? null : family,
+        grade: grade,
         phone: phone.isEmpty ? null : phone,
         guardianPhone: guardian.isEmpty ? null : guardian,
         age: age,
+        notes: student.notes?.trim().isEmpty == true
+            ? null
+            : student.notes?.trim(),
         updatedAt: DateTime.now().millisecondsSinceEpoch,
       );
-      await repository.updateStudent(updated);
+      final changed = await repository.updateStudent(updated);
       await loadStudents();
-      return true;
+      return changed > 0;
     } catch (e) {
       emit(StudentError(e.toString()));
       return false;

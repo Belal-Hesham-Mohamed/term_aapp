@@ -150,7 +150,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get studentCreatedEnrollmentFailed =>
-      'تم إنشاء الطالب، لكن تعذرت إضافته إلى المجموعة. أضف الطالب من قائمة التسجيل.';
+      'تم حفظ الطالب، لكن تعذر تسجيله بالمجموعة. أعد محاولة التسجيل دون إنشاء طالب آخر.';
 
   @override
   String get invalidPhone => 'أدخل رقم هاتف محمول مصرياً صحيحاً.';
@@ -422,4 +422,18 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get exceptionalLessonDescription =>
       'تُنشأ الحصة لهذا التاريخ فقط ولا تغيّر الجدول الأسبوعي.';
+
+  @override
+  String legacyStudentNameRetained(String name) {
+    return 'الاسم القديم: $name. سيبقى كما هو ما لم تُدخل أجزاء الاسم الثلاثة.';
+  }
+
+  @override
+  String get openExistingStudentPrompt => 'هل تريد فتح سجل الطالب الموجود؟';
+
+  @override
+  String get openExistingStudent => 'فتح سجل الطالب';
+
+  @override
+  String get retryEnrollment => 'إعادة محاولة التسجيل';
 }

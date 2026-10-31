@@ -13,6 +13,9 @@ class StudentRepositoryImpl implements StudentRepository {
   Future<List<Student>> getActiveStudents() => dataSource.getActiveStudents();
 
   @override
+  Future<Student?> getStudentById(int id) => dataSource.getStudentById(id);
+
+  @override
   Future<List<Student>> searchStudents(String query) =>
       dataSource.searchStudents(query);
 

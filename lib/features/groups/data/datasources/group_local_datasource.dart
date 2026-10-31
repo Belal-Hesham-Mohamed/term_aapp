@@ -114,6 +114,14 @@ class GroupLocalDataSource {
 
   Future<void> addStudents(int groupId, List<int> studentIds) async {
     await dbHelper.db.transaction((txn) async {
+      final group = await txn.query(
+        'groups',
+        columns: ['id'],
+        where: 'id = ?',
+        whereArgs: [groupId],
+        limit: 1,
+      );
+      if (group.isEmpty) throw StateError('Group no longer exists');
       final now = DateTime.now().millisecondsSinceEpoch;
       for (final studentId in studentIds.toSet()) {
         final activeStudent = await txn.query(
@@ -123,7 +131,9 @@ class GroupLocalDataSource {
           whereArgs: [studentId],
           limit: 1,
         );
-        if (activeStudent.isEmpty) continue;
+        if (activeStudent.isEmpty) {
+          throw StateError('Student is no longer available for enrollment');
+        }
         await txn.insert('group_students', {
           'group_id': groupId,
           'student_id': studentId,

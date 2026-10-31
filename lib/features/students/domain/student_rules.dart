@@ -21,7 +21,6 @@ class StudentRules {
     final trimmed = value.trim();
     if (trimmed.isEmpty) return '';
     final compact = trimmed.replaceAll(RegExp(r'[ -]'), '');
-    if (compact.isEmpty) return '';
     if (RegExp(r'^01[0125]\d{8}$').hasMatch(compact)) {
       return '+20${compact.substring(1)}';
     }
@@ -43,4 +42,25 @@ class StudentRules {
 
   static String normalizeName(String value) =>
       value.trim().replaceAll(RegExp(r'\s+'), ' ').toLowerCase();
+
+  static bool isSupportedGrade(String grade) => gradeIds.contains(grade);
+
+  static List<String> normalizeNameParts({
+    required String firstName,
+    required String fatherName,
+    required String familyName,
+  }) => [
+    normalizeNamePart(firstName),
+    normalizeNamePart(fatherName),
+    normalizeNamePart(familyName),
+  ];
+
+  static void validateNameParts(Iterable<String> parts) {
+    if (parts.any((part) => part.isEmpty)) {
+      throw const FormatException('required_name_part');
+    }
+  }
+
+  static int? validateAge(int? age) =>
+      age == null ? null : parseAge(age.toString());
 }

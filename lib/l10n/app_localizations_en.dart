@@ -150,7 +150,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studentCreatedEnrollmentFailed =>
-      'Student created, but could not be added to this group. Add the existing student from the enrollment list.';
+      'Student saved, but enrollment failed. Retry enrollment without creating another student.';
 
   @override
   String get invalidPhone => 'Enter a valid Egyptian mobile number.';
@@ -425,4 +425,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get exceptionalLessonDescription =>
       'This creates a lesson on one date only and does not change the weekly schedule.';
+
+  @override
+  String legacyStudentNameRetained(String name) {
+    return 'Legacy name: $name. It will be kept unless you enter all three name parts.';
+  }
+
+  @override
+  String get openExistingStudentPrompt =>
+      'Would you like to open the existing student\'s record?';
+
+  @override
+  String get openExistingStudent => 'Open student';
+
+  @override
+  String get retryEnrollment => 'Retry enrollment';
 }
