@@ -6,6 +6,7 @@ class StudyGroup {
   final int createdAt;
   final int updatedAt;
   final int activeStudentCount;
+  final bool setupCompleted;
 
   const StudyGroup({
     required this.id,
@@ -15,6 +16,7 @@ class StudyGroup {
     required this.createdAt,
     required this.updatedAt,
     this.activeStudentCount = 0,
+    this.setupCompleted = true,
   });
 
   factory StudyGroup.fromMap(Map<String, Object?> map) => StudyGroup(
@@ -25,6 +27,7 @@ class StudyGroup {
     createdAt: map['created_at'] as int,
     updatedAt: map['updated_at'] as int,
     activeStudentCount: (map['active_student_count'] as int?) ?? 0,
+    setupCompleted: (map['setup_completed'] as int? ?? 1) == 1,
   );
 
   Map<String, Object?> toMap() => {
@@ -34,5 +37,6 @@ class StudyGroup {
     'notes': notes,
     'created_at': createdAt,
     'updated_at': updatedAt,
+    'setup_completed': setupCompleted ? 1 : 0,
   };
 }

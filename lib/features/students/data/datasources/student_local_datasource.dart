@@ -10,6 +10,13 @@ class StudentLocalDataSource {
 
   StudentLocalDataSource(this.dbHelper);
 
+  Future<int> countStudents() async {
+    final rows = await dbHelper.db.rawQuery(
+      'SELECT COUNT(*) AS total FROM students',
+    );
+    return Sqflite.firstIntValue(rows) ?? 0;
+  }
+
   Future<List<Student>> getActiveStudents() async {
     final List<Map<String, dynamic>> rows = await dbHelper.db.query(
       'students',

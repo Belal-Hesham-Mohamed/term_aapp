@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/grades/grade_catalog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/study_group.dart';
+import '../../domain/entities/group_setup_outcome.dart';
 import '../cubit/group_cubit.dart';
+import '../../../students/presentation/student_labels.dart';
+import 'group_schedule_setup_page.dart';
 
 class GroupFormPage extends StatefulWidget {
   final StudyGroup? group;
@@ -49,6 +53,37 @@ class _GroupFormPageState extends State<GroupFormPage> {
       _saving = true;
       _error = null;
     });
+    if (widget.group == null) {
+      final group = await _cubit.createGroupForSetup(
+        name: _nameController.text,
+        targetGrade: _gradeController.text,
+        notes: _notesController.text,
+      );
+      if (!mounted) return;
+      if (group == null) {
+        setState(() {
+          _saving = false;
+          _error = _cubit.lastSaveWasDuplicate
+              ? AppLocalizations.of(context)!.duplicateGroupName
+              : _cubit.lastSaveWasInvalidGrade
+              ? AppLocalizations.of(context)!.invalidGrade
+              : AppLocalizations.of(context)!.groupSaveFailed;
+        });
+        return;
+      }
+      final outcome = await Navigator.push<GroupSetupOutcome>(
+        context,
+        MaterialPageRoute(builder: (_) => GroupScheduleSetupPage(group: group)),
+      );
+      if (mounted) {
+        Navigator.pop(
+          context,
+          outcome ?? GroupSetupOutcome(groupId: group.id, completed: false),
+        );
+      }
+      return;
+    }
+
     final ok = await _cubit.saveGroup(
       existing: widget.group,
       name: _nameController.text,
@@ -61,6 +96,8 @@ class _GroupFormPageState extends State<GroupFormPage> {
       if (!ok) {
         _error = _cubit.lastSaveWasDuplicate
             ? AppLocalizations.of(context)!.duplicateGroupName
+            : _cubit.lastSaveWasInvalidGrade
+            ? AppLocalizations.of(context)!.invalidGrade
             : AppLocalizations.of(context)!.groupSaveFailed;
       }
     });
@@ -90,9 +127,28 @@ class _GroupFormPageState extends State<GroupFormPage> {
                       : null,
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
-                  controller: _gradeController,
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedGrade(),
                   decoration: InputDecoration(labelText: l10n.targetGrade),
+                  items: [
+                    if (widget.group != null &&
+                        !GradeCatalog.contains(widget.group!.targetGrade))
+                      DropdownMenuItem(
+                        value: widget.group!.targetGrade,
+                        child: Text(
+                          l10n.legacyGrade(widget.group!.targetGrade),
+                        ),
+                      ),
+                    ...GradeCatalog.ids.map(
+                      (id) => DropdownMenuItem(
+                        value: id,
+                        child: Text(localizedGrade(l10n, id)),
+                      ),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) _gradeController.text = value;
+                  },
                   validator: (value) => value == null || value.trim().isEmpty
                       ? l10n.required
                       : null,
@@ -129,5 +185,11 @@ class _GroupFormPageState extends State<GroupFormPage> {
         ),
       ),
     );
+  }
+
+  String? _selectedGrade() {
+    final current = _gradeController.text;
+    if (current.isEmpty) return null;
+    return current;
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../features/students/presentation/pages/student_list_page.dart';
 import '../../features/groups/presentation/pages/groups_page.dart';
 import '../../features/lessons/presentation/pages/lessons_page.dart';
+import '../../features/home/presentation/pages/home_page.dart';
 import '../../l10n/app_localizations.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -16,7 +17,7 @@ class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = const [
-    _PlaceholderPage(titleKey: 'home'),
+    HomePage(),
     StudentListPage(),
     GroupsPage(),
     LessonsPage(),

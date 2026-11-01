@@ -2,6 +2,11 @@ import '../entities/lesson_record.dart';
 
 abstract class LessonRepository {
   Future<List<LessonRecord>> getLessons({int? groupId});
+  Future<List<LessonRecord>> getLessonsForDate(DateTime date);
+  Future<int> countLessonsInRange(
+    DateTime startInclusive,
+    DateTime endExclusive,
+  );
   Future<List<LessonRecord>> getUpcomingLessons({
     int? groupId,
     required DateTime from,

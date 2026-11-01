@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../../../../core/database/database_helper.dart';
+import '../../../../core/grades/grade_catalog.dart';
 import '../../../students/domain/entities/student.dart';
 import '../../domain/entities/study_group.dart';
 import '../../domain/repositories/group_repository.dart';
@@ -9,6 +10,13 @@ class GroupLocalDataSource {
   final DatabaseHelper dbHelper;
 
   GroupLocalDataSource(this.dbHelper);
+
+  Future<int> countGroups() async {
+    final rows = await dbHelper.db.rawQuery(
+      'SELECT COUNT(*) AS total FROM groups',
+    );
+    return Sqflite.firstIntValue(rows) ?? 0;
+  }
 
   Future<List<StudyGroup>> getGroups([String query = '']) async {
     final trimmed = query.trim();
@@ -71,6 +79,9 @@ class GroupLocalDataSource {
   }
 
   Future<int> createGroup(StudyGroup group) async {
+    if (!GradeCatalog.contains(group.targetGrade.trim())) {
+      throw const FormatException('invalid_grade');
+    }
     try {
       return await dbHelper.db.insert('groups', {
         'name': group.name.trim(),
@@ -78,6 +89,7 @@ class GroupLocalDataSource {
         'notes': _cleanNotes(group.notes),
         'created_at': group.createdAt,
         'updated_at': group.updatedAt,
+        'setup_completed': 0,
       });
     } on DatabaseException catch (error) {
       if (error.toString().contains('UNIQUE constraint failed: groups.name')) {
@@ -88,12 +100,18 @@ class GroupLocalDataSource {
   }
 
   Future<void> updateGroup(StudyGroup group) async {
+    final existing = await getGroup(group.id);
+    final targetGrade = group.targetGrade.trim();
+    if (!GradeCatalog.contains(targetGrade) &&
+        targetGrade != existing.targetGrade) {
+      throw const FormatException('invalid_grade');
+    }
     try {
       final changed = await dbHelper.db.update(
         'groups',
         {
           'name': group.name.trim(),
-          'target_grade': group.targetGrade.trim(),
+          'target_grade': targetGrade,
           'notes': _cleanNotes(group.notes),
           'updated_at': DateTime.now().millisecondsSinceEpoch,
         },
@@ -177,6 +195,18 @@ class GroupLocalDataSource {
     );
     return txn.delete('groups', where: 'id = ?', whereArgs: [groupId]);
   });
+
+  Future<bool> completeSetup(int groupId) async =>
+      await dbHelper.db.update(
+        'groups',
+        {
+          'setup_completed': 1,
+          'updated_at': DateTime.now().millisecondsSinceEpoch,
+        },
+        where: 'id = ?',
+        whereArgs: [groupId],
+      ) >
+      0;
 
   String? _cleanNotes(String? notes) {
     final trimmed = notes?.trim();

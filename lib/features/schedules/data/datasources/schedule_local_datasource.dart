@@ -59,13 +59,17 @@ class ScheduleLocalDataSource {
     if (start == null || end == null || start >= end) {
       throw ArgumentError('Invalid schedule time range');
     }
-    if (!schedule.active) return;
     final rows = await executor.query(
       'group_schedules',
-      where: 'group_id = ? AND weekday = ? AND active = 1 AND id != ?',
+      where: 'group_id = ? AND weekday = ? AND id != ?',
       whereArgs: [schedule.groupId, schedule.weekday, exceptId ?? -1],
     );
     for (final row in rows) {
+      if (row['start_time'] == schedule.startTime &&
+          row['end_time'] == schedule.endTime) {
+        throw ScheduleConflictException();
+      }
+      if (!schedule.active || row['active'] != 1) continue;
       final otherStart = _minutes(row['start_time'] as String? ?? '');
       final otherEnd = _minutes(row['end_time'] as String? ?? '');
       if (otherStart != null &&

@@ -9,6 +9,16 @@ class LessonRepositoryImpl implements LessonRepository {
   @override
   Future<List<LessonRecord>> getLessons({int? groupId}) =>
       dataSource.getLessons(groupId: groupId);
+
+  @override
+  Future<List<LessonRecord>> getLessonsForDate(DateTime date) =>
+      dataSource.getLessonsForDate(date);
+
+  @override
+  Future<int> countLessonsInRange(
+    DateTime startInclusive,
+    DateTime endExclusive,
+  ) => dataSource.countLessonsInRange(startInclusive, endExclusive);
   @override
   Future<List<LessonRecord>> getUpcomingLessons({
     int? groupId,

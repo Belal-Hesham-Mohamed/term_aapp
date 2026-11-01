@@ -110,6 +110,60 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
+  /// No description provided for @welcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back, {teacherName}!'**
+  String welcomeBack(Object teacherName);
+
+  /// No description provided for @homeOverviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Here\'s a quick overview of your daily activity.'**
+  String get homeOverviewSubtitle;
+
+  /// No description provided for @teacherNameFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Teacher'**
+  String get teacherNameFallback;
+
+  /// No description provided for @todaysLessons.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Lessons'**
+  String get todaysLessons;
+
+  /// No description provided for @noLessonsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No lessons are scheduled for today.'**
+  String get noLessonsToday;
+
+  /// No description provided for @homeLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the home summary. Please try again.'**
+  String get homeLoadFailed;
+
+  /// No description provided for @totalGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Groups'**
+  String get totalGroups;
+
+  /// No description provided for @totalStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Students'**
+  String get totalStudents;
+
+  /// No description provided for @lessonsThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Lessons This Week'**
+  String get lessonsThisWeek;
+
   /// No description provided for @students.
   ///
   /// In en, this message translates to:
@@ -528,7 +582,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Legacy grade: {grade}'**
-  String legacyGrade(Object grade);
+  String legacyGrade(String grade);
 
   /// No description provided for @duplicateSameStudent.
   ///
@@ -979,6 +1033,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry enrollment'**
   String get retryEnrollment;
+
+  /// No description provided for @invalidGrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a grade from the list.'**
+  String get invalidGrade;
+
+  /// No description provided for @groupScheduleSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up group schedule'**
+  String get groupScheduleSetup;
+
+  /// No description provided for @groupScheduleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one weekly schedule to continue.'**
+  String get groupScheduleRequired;
+
+  /// No description provided for @continueToStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to students'**
+  String get continueToStudents;
+
+  /// No description provided for @finishSetupLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish later'**
+  String get finishSetupLater;
+
+  /// No description provided for @groupSetupComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Group setup complete'**
+  String get groupSetupComplete;
+
+  /// No description provided for @configuredSchedules.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly schedules'**
+  String get configuredSchedules;
+
+  /// No description provided for @enrolledStudentCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enrolled students'**
+  String get enrolledStudentCount;
+
+  /// No description provided for @openGroupDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Open group details'**
+  String get openGroupDetails;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @studentGradeMismatchWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Some selected students are not in {targetGrade}. You can still enroll them.'**
+  String studentGradeMismatchWarning(String targetGrade);
+
+  /// No description provided for @finishSetupWithoutStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish without students'**
+  String get finishSetupWithoutStudents;
+
+  /// No description provided for @groupSetupSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save group setup. Please try again.'**
+  String get groupSetupSaveFailed;
+
+  /// No description provided for @groupSetupIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup incomplete — continue setup'**
+  String get groupSetupIncomplete;
 }
 
 class _AppLocalizationsDelegate

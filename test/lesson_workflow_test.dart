@@ -94,6 +94,10 @@ void main() {
       final scheduleId = await schedules.createSchedule(schedule());
       final lessonId = await lessons.createLesson(lesson());
       await expectLater(
+        schedules.createSchedule(schedule()),
+        throwsA(isA<ScheduleConflictException>()),
+      );
+      await expectLater(
         schedules.createSchedule(schedule(start: '09:30', end: '10:30')),
         throwsA(isA<ScheduleConflictException>()),
       );
@@ -546,10 +550,7 @@ void main() {
       scheduleRowsAfter.single.startTime,
       scheduleRowsBefore.single.startTime,
     );
-    expect(
-      scheduleRowsAfter.single.endTime,
-      scheduleRowsBefore.single.endTime,
-    );
+    expect(scheduleRowsAfter.single.endTime, scheduleRowsBefore.single.endTime);
   });
 
   test('attendance transaction rolls back if a status is invalid', () async {

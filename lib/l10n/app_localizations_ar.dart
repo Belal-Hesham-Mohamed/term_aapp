@@ -15,6 +15,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get home => 'الرئيسية';
 
   @override
+  String welcomeBack(Object teacherName) {
+    return 'مرحبًا بعودتك، $teacherName!';
+  }
+
+  @override
+  String get homeOverviewSubtitle => 'إليك ملخصًا سريعًا لنشاطك اليومي.';
+
+  @override
+  String get teacherNameFallback => 'المدرس';
+
+  @override
+  String get todaysLessons => 'دروس اليوم';
+
+  @override
+  String get noLessonsToday => 'لا توجد دروس مجدولة اليوم.';
+
+  @override
+  String get homeLoadFailed =>
+      'تعذر تحميل ملخص الصفحة الرئيسية. حاول مرة أخرى.';
+
+  @override
+  String get totalGroups => 'إجمالي المجموعات';
+
+  @override
+  String get totalStudents => 'إجمالي الطلاب';
+
+  @override
+  String get lessonsThisWeek => 'دروس هذا الأسبوع';
+
+  @override
   String get students => 'الطلاب';
 
   @override
@@ -232,7 +262,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gradeSecondary3 => 'الصف الثالث الثانوي';
 
   @override
-  String legacyGrade(Object grade) {
+  String legacyGrade(String grade) {
     return 'صف قديم: $grade';
   }
 
@@ -473,4 +503,49 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get retryEnrollment => 'إعادة محاولة التسجيل';
+
+  @override
+  String get invalidGrade => 'اختر صفًا من القائمة.';
+
+  @override
+  String get groupScheduleSetup => 'إعداد جدول المجموعة';
+
+  @override
+  String get groupScheduleRequired =>
+      'أضف موعدًا أسبوعيًا واحدًا على الأقل للمتابعة.';
+
+  @override
+  String get continueToStudents => 'المتابعة إلى الطلاب';
+
+  @override
+  String get finishSetupLater => 'إنهاء لاحقًا';
+
+  @override
+  String get groupSetupComplete => 'اكتمل إعداد المجموعة';
+
+  @override
+  String get configuredSchedules => 'المواعيد الأسبوعية';
+
+  @override
+  String get enrolledStudentCount => 'الطلاب المسجلون';
+
+  @override
+  String get openGroupDetails => 'فتح تفاصيل المجموعة';
+
+  @override
+  String get done => 'تم';
+
+  @override
+  String studentGradeMismatchWarning(String targetGrade) {
+    return 'بعض الطلاب المحددين ليسوا في $targetGrade. يمكنك تسجيلهم رغم ذلك.';
+  }
+
+  @override
+  String get finishSetupWithoutStudents => 'إنهاء الإعداد دون طلاب';
+
+  @override
+  String get groupSetupSaveFailed => 'تعذر حفظ إعداد المجموعة. حاول مرة أخرى.';
+
+  @override
+  String get groupSetupIncomplete => 'الإعداد غير مكتمل — متابعة الإعداد';
 }

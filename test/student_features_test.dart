@@ -542,6 +542,8 @@ class _ControlledRepository implements StudentRepository {
   final active = Completer<List<Student>>();
   final Map<String, Completer<List<Student>>> searches = {};
   @override
+  Future<int> countStudents() async => 0;
+  @override
   Future<List<Student>> getActiveStudents() => active.future;
   @override
   Future<Student?> getStudentById(int id) async => null;

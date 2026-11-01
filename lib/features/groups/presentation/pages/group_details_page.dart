@@ -7,6 +7,7 @@ import '../cubit/group_cubit.dart';
 import '../state/group_state.dart';
 import 'group_form_page.dart';
 import 'student_enrollment_page.dart';
+import 'group_schedule_setup_page.dart';
 import '../../../schedules/presentation/pages/group_schedules_section.dart';
 import '../../../lessons/presentation/pages/group_lessons_section.dart';
 import '../../../students/presentation/student_labels.dart';
@@ -49,10 +50,17 @@ class _GroupDetailsViewState extends State<_GroupDetailsView> {
   }
 
   Future<void> _enroll(BuildContext context) async {
+    final current = context.read<GroupCubit>().state;
+    final targetGrade = current is GroupDetailsLoaded
+        ? current.group.targetGrade
+        : null;
     final changed = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (_) => StudentEnrollmentPage(groupId: widget.groupId),
+        builder: (_) => StudentEnrollmentPage(
+          groupId: widget.groupId,
+          targetGrade: targetGrade,
+        ),
       ),
     );
     if (changed == true && context.mounted) {
@@ -154,6 +162,7 @@ class _GroupDetailsViewState extends State<_GroupDetailsView> {
             );
           }
           if (state is! GroupDetailsLoaded) return const SizedBox.shrink();
+          final group = state.group;
           return ListView(
             children: [
               Padding(
@@ -165,8 +174,28 @@ class _GroupDetailsViewState extends State<_GroupDetailsView> {
               ),
               ListTile(
                 title: Text(l10n.targetGrade),
-                subtitle: Text(state.group.targetGrade),
+                subtitle: Text(localizedGrade(l10n, group.targetGrade)),
               ),
+              if (!group.setupCompleted)
+                Card(
+                  margin: const EdgeInsets.all(12),
+                  child: ListTile(
+                    leading: const Icon(Icons.pending_actions),
+                    title: Text(l10n.groupSetupIncomplete),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () async {
+                      final outcome = await Navigator.push<Object?>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => GroupScheduleSetupPage(group: group),
+                        ),
+                      );
+                      if (context.mounted && outcome != null) {
+                        context.read<GroupCubit>().loadDetails(widget.groupId);
+                      }
+                    },
+                  ),
+                ),
               if (state.group.notes?.isNotEmpty == true)
                 ListTile(
                   title: Text(l10n.notes),

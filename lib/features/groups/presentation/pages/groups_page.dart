@@ -4,10 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/study_group.dart';
+import '../../domain/entities/group_setup_outcome.dart';
 import '../cubit/group_cubit.dart';
 import '../state/group_state.dart';
 import 'group_details_page.dart';
 import 'group_form_page.dart';
+import '../../../students/presentation/student_labels.dart';
 
 class GroupsPage extends StatelessWidget {
   const GroupsPage({super.key});
@@ -37,11 +39,21 @@ class _GroupsViewState extends State<_GroupsView> {
   }
 
   Future<void> _openForm({StudyGroup? group}) async {
-    final saved = await Navigator.push<bool>(
+    final saved = await Navigator.push<Object?>(
       context,
       MaterialPageRoute(builder: (_) => GroupFormPage(group: group)),
     );
-    if (saved == true && mounted) context.read<GroupCubit>().loadGroups();
+    if (!mounted) return;
+    context.read<GroupCubit>().loadGroups();
+    if (saved is GroupSetupOutcome && saved.openGroupDetails && mounted) {
+      await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => GroupDetailsPage(groupId: saved.groupId),
+        ),
+      );
+      if (mounted) context.read<GroupCubit>().loadGroups();
+    }
   }
 
   @override
@@ -96,7 +108,7 @@ class _GroupsViewState extends State<_GroupsView> {
                     return ListTile(
                       title: Text(group.name),
                       subtitle: Text(
-                        '${l10n.targetGrade}: ${group.targetGrade} | ${l10n.activeStudents}: ${group.activeStudentCount}',
+                        '${l10n.targetGrade}: ${localizedGrade(l10n, group.targetGrade)} | ${l10n.activeStudents}: ${group.activeStudentCount}${group.setupCompleted ? '' : ' | ${l10n.groupSetupIncomplete}'}',
                       ),
                       onTap: () async {
                         final deleted = await Navigator.push<bool>(

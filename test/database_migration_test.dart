@@ -119,4 +119,39 @@ void main() {
       await db.close();
     },
   );
+
+  test(
+    'version 2 migration preserves existing groups as established',
+    () async {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+      final db = await openDatabase(
+        inMemoryDatabasePath,
+        version: 2,
+        onCreate: (db, _) async {
+          await db.execute('''CREATE TABLE groups (
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL,
+          target_grade TEXT NOT NULL,
+          notes TEXT,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL
+        )''');
+          await db.insert('groups', {
+            'id': 17,
+            'name': 'Legacy group',
+            'target_grade': 'Grade 7',
+            'created_at': 4,
+            'updated_at': 8,
+          });
+        },
+      );
+      await DatabaseHelper.migrate(db, 2, 3);
+      final group = (await db.query('groups')).single;
+      expect(group['setup_completed'], 1);
+      expect(group['target_grade'], 'Grade 7');
+      expect(group['name'], 'Legacy group');
+      await db.close();
+    },
+  );
 }

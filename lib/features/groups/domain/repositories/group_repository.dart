@@ -3,6 +3,7 @@ import '../entities/study_group.dart';
 
 abstract class GroupRepository {
   Future<List<StudyGroup>> getGroups();
+  Future<int> countGroups();
   Future<List<StudyGroup>> searchGroups(String query);
   Future<StudyGroup> getGroup(int groupId);
   Future<List<Student>> getEnrolledStudents(int groupId);
@@ -12,6 +13,7 @@ abstract class GroupRepository {
   Future<void> addStudents(int groupId, List<int> studentIds);
   Future<bool> removeStudent(int groupId, int studentId);
   Future<int> deleteGroup(int groupId);
+  Future<bool> completeSetup(int groupId);
 }
 
 class DuplicateGroupNameException implements Exception {}

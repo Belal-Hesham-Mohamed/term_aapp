@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/grades/grade_catalog.dart';
 import '../../domain/entities/study_group.dart';
 import '../../domain/repositories/group_repository.dart';
 import '../state/group_state.dart';
@@ -14,6 +15,7 @@ class GroupCubit extends Cubit<GroupState> {
   bool _saving = false;
   bool _deleting = false;
   bool lastSaveWasDuplicate = false;
+  bool lastSaveWasInvalidGrade = false;
 
   GroupCubit(this.repository) : super(GroupLoading());
 
@@ -59,9 +61,15 @@ class GroupCubit extends Cubit<GroupState> {
   }) async {
     if (_saving) return false;
     lastSaveWasDuplicate = false;
+    lastSaveWasInvalidGrade = false;
     final cleanName = name.trim();
     final cleanGrade = targetGrade.trim();
     if (cleanName.isEmpty || cleanGrade.isEmpty) return false;
+    if (!GradeCatalog.contains(cleanGrade) &&
+        (existing == null || cleanGrade != existing.targetGrade)) {
+      lastSaveWasInvalidGrade = true;
+      return false;
+    }
     _saving = true;
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -98,6 +106,64 @@ class GroupCubit extends Cubit<GroupState> {
       _saving = false;
     }
   }
+
+  Future<StudyGroup?> createGroupForSetup({
+    required String name,
+    required String targetGrade,
+    String? notes,
+  }) async {
+    if (_saving) return null;
+    lastSaveWasDuplicate = false;
+    lastSaveWasInvalidGrade = false;
+    final cleanName = name.trim();
+    final cleanGrade = targetGrade.trim();
+    if (cleanName.isEmpty) return null;
+    if (!GradeCatalog.contains(cleanGrade)) {
+      lastSaveWasInvalidGrade = true;
+      return null;
+    }
+    _saving = true;
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final id = await repository.createGroup(
+        StudyGroup(
+          id: 0,
+          name: cleanName,
+          targetGrade: cleanGrade,
+          notes: notes,
+          createdAt: now,
+          updatedAt: now,
+          setupCompleted: false,
+        ),
+      );
+      StudyGroup group;
+      try {
+        group = await repository.getGroup(id);
+      } catch (_) {
+        // The insert already succeeded. Keep its ID and let the persisted
+        // group details screen reload instead of inviting a duplicate retry.
+        group = StudyGroup(
+          id: id,
+          name: cleanName,
+          targetGrade: cleanGrade,
+          notes: notes,
+          createdAt: now,
+          updatedAt: now,
+          setupCompleted: false,
+        );
+      }
+      await loadGroups();
+      return group;
+    } catch (error) {
+      lastSaveWasDuplicate = error is DuplicateGroupNameException;
+      if (!isClosed) emit(GroupFailure(error.toString()));
+      return null;
+    } finally {
+      _saving = false;
+    }
+  }
+
+  Future<bool> completeSetup(int groupId) => repository.completeSetup(groupId);
 
   Future<void> loadDetails(int groupId) async {
     emit(GroupDetailsLoading());

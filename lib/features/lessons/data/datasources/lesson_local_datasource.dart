@@ -9,6 +9,50 @@ class LessonLocalDataSource {
   final DatabaseHelper dbHelper;
   LessonLocalDataSource(this.dbHelper);
 
+  Future<List<LessonRecord>> getLessonsForDate(DateTime date) async {
+    final start = DateTime(
+      date.year,
+      date.month,
+      date.day,
+    ).millisecondsSinceEpoch;
+    final end = DateTime(
+      date.year,
+      date.month,
+      date.day + 1,
+    ).millisecondsSinceEpoch;
+    final rows = await dbHelper.db.rawQuery(
+      '''SELECT DISTINCT l.*, g.name AS group_name, g.target_grade AS group_grade
+         FROM lessons l INNER JOIN groups g ON g.id = l.group_id
+         WHERE l.scheduled_date >= ? AND l.scheduled_date < ? AND l.is_canceled = 0
+         ORDER BY l.start_time ASC, l.id ASC''',
+      [start, end],
+    );
+    return rows.map(LessonRecord.fromMap).toList();
+  }
+
+  Future<int> countLessonsInRange(
+    DateTime startInclusive,
+    DateTime endExclusive,
+  ) async {
+    final start = DateTime(
+      startInclusive.year,
+      startInclusive.month,
+      startInclusive.day,
+    ).millisecondsSinceEpoch;
+    final end = DateTime(
+      endExclusive.year,
+      endExclusive.month,
+      endExclusive.day,
+    ).millisecondsSinceEpoch;
+    final rows = await dbHelper.db.rawQuery(
+      '''SELECT COUNT(DISTINCT l.id) AS total FROM lessons l
+         INNER JOIN groups g ON g.id = l.group_id
+         WHERE l.scheduled_date >= ? AND l.scheduled_date < ? AND l.is_canceled = 0''',
+      [start, end],
+    );
+    return Sqflite.firstIntValue(rows) ?? 0;
+  }
+
   Future<List<LessonRecord>> getLessons({int? groupId}) async {
     final rows = await dbHelper.db.rawQuery(
       '''SELECT l.*, g.name AS group_name, g.target_grade AS group_grade FROM lessons l

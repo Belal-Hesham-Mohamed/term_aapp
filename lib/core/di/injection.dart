@@ -22,6 +22,10 @@ import '../../features/attendance/data/datasources/attendance_local_datasource.d
 import '../../features/attendance/data/repositories/attendance_repository_impl.dart';
 import '../../features/attendance/domain/repositories/attendance_repository.dart';
 import '../../features/attendance/presentation/cubit/attendance_cubit.dart';
+import '../../features/home/data/datasources/home_local_datasource.dart';
+import '../../features/home/data/repositories/home_repository_impl.dart';
+import '../../features/home/domain/repositories/home_repository.dart';
+import '../../features/home/presentation/cubit/home_cubit.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -63,8 +67,26 @@ Future<void> setup() async {
   registerScheduleDependencies(getIt);
   registerLessonDependencies(getIt);
   registerAttendanceDependencies(getIt);
+  registerHomeDependencies(getIt);
 
   await getIt.allReady();
+}
+
+void registerHomeDependencies(GetIt locator) {
+  locator.registerFactory<HomeLocalDataSource>(
+    () => HomeLocalDataSource(locator<DatabaseHelper>()),
+  );
+  locator.registerFactory<HomeRepository>(
+    () => HomeRepositoryImpl(
+      dataSource: locator<HomeLocalDataSource>(),
+      groups: locator<GroupRepository>(),
+      students: locator<StudentRepository>(),
+      lessons: locator<LessonRepository>(),
+    ),
+  );
+  locator.registerFactory<HomeCubit>(
+    () => HomeCubit(locator<HomeRepository>()),
+  );
 }
 
 void registerGroupDependencies(GetIt locator) {

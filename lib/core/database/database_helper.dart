@@ -8,7 +8,7 @@ import 'migrations.dart';
 
 class DatabaseHelper {
   static const String _dbName = 'term.db';
-  static const int _dbVersion = 2;
+  static const int _dbVersion = 3;
 
   Database? _db;
   Database get db => _db!;
@@ -58,9 +58,9 @@ class DatabaseHelper {
     int newVersion,
   ) async {
     if (oldVersion < 2) {
-      final columns = (await db.rawQuery('PRAGMA table_info(students)'))
-          .map((column) => column['name'] as String)
-          .toSet();
+      final columns = (await db.rawQuery(
+        'PRAGMA table_info(students)',
+      )).map((column) => column['name'] as String).toSet();
 
       const additions = <String, String>{
         'first_name': 'TEXT',
@@ -75,6 +75,18 @@ class DatabaseHelper {
             'ALTER TABLE students ADD COLUMN ${entry.key} ${entry.value}',
           );
         }
+      }
+    }
+    if (oldVersion < 3 && newVersion >= 3) {
+      final columns = (await db.rawQuery(
+        'PRAGMA table_info(groups)',
+      )).map((column) => column['name'] as String).toSet();
+      if (!columns.contains('setup_completed')) {
+        // Existing groups are treated as established; only new guided groups
+        // begin incomplete. This preserves their prior product behavior.
+        await db.execute(
+          'ALTER TABLE groups ADD COLUMN setup_completed INTEGER NOT NULL DEFAULT 1',
+        );
       }
     }
   }

@@ -15,6 +15,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
+  String welcomeBack(Object teacherName) {
+    return 'Welcome back, $teacherName!';
+  }
+
+  @override
+  String get homeOverviewSubtitle =>
+      'Here\'s a quick overview of your daily activity.';
+
+  @override
+  String get teacherNameFallback => 'Teacher';
+
+  @override
+  String get todaysLessons => 'Today\'s Lessons';
+
+  @override
+  String get noLessonsToday => 'No lessons are scheduled for today.';
+
+  @override
+  String get homeLoadFailed =>
+      'Could not load the home summary. Please try again.';
+
+  @override
+  String get totalGroups => 'Total Groups';
+
+  @override
+  String get totalStudents => 'Total Students';
+
+  @override
+  String get lessonsThisWeek => 'Lessons This Week';
+
+  @override
   String get students => 'Students';
 
   @override
@@ -234,7 +265,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gradeSecondary3 => 'Third Secondary';
 
   @override
-  String legacyGrade(Object grade) {
+  String legacyGrade(String grade) {
     return 'Legacy grade: $grade';
   }
 
@@ -479,4 +510,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get retryEnrollment => 'Retry enrollment';
+
+  @override
+  String get invalidGrade => 'Choose a grade from the list.';
+
+  @override
+  String get groupScheduleSetup => 'Set up group schedule';
+
+  @override
+  String get groupScheduleRequired =>
+      'Add at least one weekly schedule to continue.';
+
+  @override
+  String get continueToStudents => 'Continue to students';
+
+  @override
+  String get finishSetupLater => 'Finish later';
+
+  @override
+  String get groupSetupComplete => 'Group setup complete';
+
+  @override
+  String get configuredSchedules => 'Weekly schedules';
+
+  @override
+  String get enrolledStudentCount => 'Enrolled students';
+
+  @override
+  String get openGroupDetails => 'Open group details';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String studentGradeMismatchWarning(String targetGrade) {
+    return 'Some selected students are not in $targetGrade. You can still enroll them.';
+  }
+
+  @override
+  String get finishSetupWithoutStudents => 'Finish without students';
+
+  @override
+  String get groupSetupSaveFailed =>
+      'Could not save group setup. Please try again.';
+
+  @override
+  String get groupSetupIncomplete => 'Setup incomplete — continue setup';
 }

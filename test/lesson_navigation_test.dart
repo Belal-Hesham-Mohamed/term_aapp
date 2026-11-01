@@ -9,6 +9,7 @@ import 'package:term/features/attendance/presentation/cubit/attendance_cubit.dar
 import 'package:term/features/groups/domain/entities/study_group.dart';
 import 'package:term/features/groups/domain/repositories/group_repository.dart';
 import 'package:term/features/groups/presentation/cubit/group_cubit.dart';
+import 'package:term/features/home/presentation/cubit/home_cubit.dart';
 import 'package:term/features/lessons/domain/entities/lesson_record.dart';
 import 'package:term/features/lessons/domain/repositories/lesson_repository.dart';
 import 'package:term/features/lessons/presentation/cubit/lesson_cubit.dart';
@@ -18,6 +19,7 @@ import 'package:term/features/schedules/domain/repositories/schedule_repository.
 import 'package:term/features/schedules/presentation/cubit/schedule_cubit.dart';
 import 'package:term/features/students/domain/entities/student.dart';
 import 'package:term/l10n/app_localizations.dart';
+import 'home_test_doubles.dart';
 
 void main() {
   final locator = getIt;
@@ -48,6 +50,9 @@ void main() {
   testWidgets('group details navigate through lessons to attendance', (
     tester,
   ) async {
+    locator.registerFactory<HomeCubit>(
+      () => HomeCubit(const EmptyHomeRepository()),
+    );
     locator.registerFactory<GroupCubit>(() => GroupCubit(_Groups(group)));
     locator.registerFactory<ScheduleCubit>(() => ScheduleCubit(_Schedules()));
     locator.registerFactory<LessonCubit>(() => LessonCubit(_Lessons(lesson)));
@@ -145,6 +150,8 @@ class _Groups implements GroupRepository {
   final StudyGroup group;
   _Groups(this.group);
   @override
+  Future<int> countGroups() async => 1;
+  @override
   Future<List<StudyGroup>> getGroups() async => [group];
   @override
   Future<List<StudyGroup>> searchGroups(String query) async => [group];
@@ -164,6 +171,8 @@ class _Groups implements GroupRepository {
   Future<bool> removeStudent(int groupId, int studentId) async => true;
   @override
   Future<int> deleteGroup(int groupId) async => 1;
+  @override
+  Future<bool> completeSetup(int groupId) async => true;
 }
 
 class _Schedules implements ScheduleRepository {
@@ -181,6 +190,14 @@ class _Lessons implements LessonRepository {
   final LessonRecord lesson;
   final List<LessonRecord>? upcomingLessons;
   _Lessons(this.lesson, {this.upcomingLessons});
+  @override
+  Future<List<LessonRecord>> getLessonsForDate(DateTime date) async =>
+      upcomingLessons ?? [lesson];
+  @override
+  Future<int> countLessonsInRange(
+    DateTime startInclusive,
+    DateTime endExclusive,
+  ) async => 1;
   @override
   Future<List<LessonRecord>> getLessons({int? groupId}) async =>
       upcomingLessons ?? [lesson];

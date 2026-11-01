@@ -6,6 +6,8 @@ import 'package:term/core/navigation/main_navigation.dart';
 import 'package:term/features/groups/domain/entities/study_group.dart';
 import 'package:term/features/groups/domain/repositories/group_repository.dart';
 import 'package:term/features/groups/presentation/cubit/group_cubit.dart';
+import 'package:term/features/home/presentation/cubit/home_cubit.dart';
+import 'home_test_doubles.dart';
 import 'package:term/features/students/domain/entities/student.dart';
 import 'package:term/l10n/app_localizations.dart';
 
@@ -17,6 +19,9 @@ void main() {
   testWidgets('Groups bottom navigation destination opens the Groups page', (
     tester,
   ) async {
+    locator.registerFactory<HomeCubit>(
+      () => HomeCubit(const EmptyHomeRepository()),
+    );
     locator.registerFactory<GroupCubit>(
       () => GroupCubit(_EmptyGroupRepository()),
     );
@@ -42,6 +47,8 @@ void main() {
 
 class _EmptyGroupRepository implements GroupRepository {
   @override
+  Future<int> countGroups() async => 0;
+  @override
   Future<List<StudyGroup>> getGroups() async => [];
   @override
   Future<List<StudyGroup>> searchGroups(String query) async => [];
@@ -61,4 +68,6 @@ class _EmptyGroupRepository implements GroupRepository {
   Future<bool> removeStudent(int groupId, int studentId) async => true;
   @override
   Future<int> deleteGroup(int groupId) async => 1;
+  @override
+  Future<bool> completeSetup(int groupId) async => true;
 }

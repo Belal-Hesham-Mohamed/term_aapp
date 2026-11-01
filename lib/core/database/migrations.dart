@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS groups (
   target_grade TEXT NOT NULL,
   notes TEXT,
   created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL
+  updated_at INTEGER NOT NULL,
+  setup_completed INTEGER NOT NULL DEFAULT 1
 );
 ''';
 

@@ -2,16 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/grades/grade_catalog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../students/domain/entities/student.dart';
+import '../../domain/entities/group_setup_outcome.dart';
 import '../cubit/group_cubit.dart';
 import '../state/group_state.dart';
+import 'group_setup_complete_page.dart';
 import '../../../students/presentation/pages/student_form_page.dart';
 import '../../../students/presentation/student_labels.dart';
 
 class StudentEnrollmentPage extends StatefulWidget {
   final int groupId;
-  const StudentEnrollmentPage({super.key, required this.groupId});
+  final String? targetGrade;
+  final bool completeSetupOnSave;
+  const StudentEnrollmentPage({
+    super.key,
+    required this.groupId,
+    this.targetGrade,
+    this.completeSetupOnSave = false,
+  });
 
   @override
   State<StudentEnrollmentPage> createState() => _StudentEnrollmentPageState();
@@ -20,6 +30,8 @@ class StudentEnrollmentPage extends StatefulWidget {
 class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
   late final GroupCubit _cubit;
   final Set<int> _selected = {};
+  final TextEditingController _searchController = TextEditingController();
+  String _query = '';
   bool _saving = false;
 
   @override
@@ -31,11 +43,16 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
   @override
   void dispose() {
     _cubit.close();
+    _searchController.dispose();
     super.dispose();
   }
 
   Future<void> _add() async {
-    if (_saving || _selected.isEmpty) return;
+    if (_saving) return;
+    if (_selected.isEmpty) {
+      if (widget.completeSetupOnSave) await _completeSetup();
+      return;
+    }
     setState(() => _saving = true);
     final success = await _cubit.addStudents(
       widget.groupId,
@@ -43,16 +60,53 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
     );
     if (!mounted) return;
     setState(() => _saving = false);
-    if (success) Navigator.pop(context, true);
+    if (success && widget.completeSetupOnSave) {
+      await _completeSetup();
+    } else if (success) {
+      Navigator.pop(context, true);
+    }
+  }
+
+  Future<void> _completeSetup() async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final completed = await _cubit.completeSetup(widget.groupId);
+      if (!mounted) return;
+      if (!completed) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.groupSetupSaveFailed)));
+        return;
+      }
+      final outcome = await Navigator.push<GroupSetupOutcome>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => GroupSetupCompletePage(groupId: widget.groupId),
+        ),
+      );
+      if (mounted && outcome != null) Navigator.pop(context, outcome);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.groupSetupSaveFailed)));
+      }
+    }
   }
 
   Future<void> _addNewStudent() async {
     final result = await Navigator.push<Object?>(
       context,
       MaterialPageRoute(
-        builder: (_) => StudentFormPage(enrollInGroupId: widget.groupId),
+        builder: (_) => StudentFormPage(
+          enrollInGroupId: widget.completeSetupOnSave ? null : widget.groupId,
+        ),
       ),
     );
+    if (widget.completeSetupOnSave && result == true && mounted) {
+      await _cubit.loadAvailableStudents(widget.groupId);
+      return;
+    }
     if (result is StudentCreationResult && mounted) {
       await _cubit.loadAvailableStudents(widget.groupId);
       if (result.enrolled && mounted) {
@@ -124,6 +178,30 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
             return Column(
               children: [
                 Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: l10n.searchHint,
+                      prefixIcon: const Icon(Icons.search),
+                      border: const OutlineInputBorder(),
+                    ),
+                    onChanged: (value) => setState(() => _query = value.trim()),
+                  ),
+                ),
+                if (_hasGradeMismatch(state.students))
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(
+                      l10n.studentGradeMismatchWarning(
+                        localizedGrade(l10n, widget.targetGrade!),
+                      ),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ),
+                Padding(
                   padding: const EdgeInsets.all(12),
                   child: Align(
                     alignment: AlignmentDirectional.centerStart,
@@ -135,12 +213,13 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
                   ),
                 ),
                 Expanded(
-                  child: state.students.isEmpty
+                  child: _filteredStudents(state.students).isEmpty
                       ? Center(child: Text(l10n.noAvailableStudents))
                       : ListView.builder(
-                          itemCount: state.students.length,
-                          itemBuilder: (context, index) =>
-                              _studentTile(state.students[index]),
+                          itemCount: _filteredStudents(state.students).length,
+                          itemBuilder: (context, index) => _studentTile(
+                            _filteredStudents(state.students)[index],
+                          ),
                         ),
                 ),
               ],
@@ -151,10 +230,12 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: ElevatedButton(
-              onPressed: _saving || _selected.isEmpty ? null : _add,
+              onPressed: _saving ? null : _add,
               child: Text(
                 _saving
                     ? l10n.saving
+                    : _selected.isEmpty && widget.completeSetupOnSave
+                    ? l10n.finishSetupWithoutStudents
                     : l10n.addSelectedStudents(_selected.length),
               ),
             ),
@@ -178,4 +259,34 @@ class _StudentEnrollmentPageState extends State<StudentEnrollmentPage> {
       localizedGrade(AppLocalizations.of(context)!, student.grade),
     ),
   );
+
+  List<Student> _filteredStudents(List<Student> students) {
+    final query = _query.toLowerCase();
+    if (query.isEmpty) return students;
+    return students.where((student) {
+      final values = [
+        student.displayName,
+        student.name,
+        student.firstName,
+        student.fatherName,
+        student.familyName,
+        student.phone,
+        student.grade,
+      ];
+      return values.any(
+        (value) => value?.toLowerCase().contains(query) == true,
+      );
+    }).toList();
+  }
+
+  bool _hasGradeMismatch(List<Student> students) {
+    final target = widget.targetGrade;
+    if (target == null || !GradeCatalog.contains(target)) return false;
+    return students.any(
+      (student) =>
+          _selected.contains(student.id) &&
+          GradeCatalog.contains(student.grade) &&
+          student.grade != target,
+    );
+  }
 }

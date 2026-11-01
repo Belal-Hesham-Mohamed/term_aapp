@@ -12,6 +12,9 @@ class GroupRepositoryImpl implements GroupRepository {
   Future<List<StudyGroup>> getGroups() => dataSource.getGroups();
 
   @override
+  Future<int> countGroups() => dataSource.countGroups();
+
+  @override
   Future<List<StudyGroup>> searchGroups(String query) =>
       dataSource.getGroups(query);
 
@@ -42,4 +45,7 @@ class GroupRepositoryImpl implements GroupRepository {
 
   @override
   Future<int> deleteGroup(int groupId) => dataSource.deleteGroup(groupId);
+
+  @override
+  Future<bool> completeSetup(int groupId) => dataSource.completeSetup(groupId);
 }

@@ -27,7 +27,11 @@ void main() {
 
   tearDown(() async => database.db.close());
 
-  Future<int> addGroup(String name, {String grade = 'Grade 7', String? notes}) {
+  Future<int> addGroup(
+    String name, {
+    String grade = 'primary_1',
+    String? notes,
+  }) {
     final now = DateTime.now().millisecondsSinceEpoch;
     return repository.createGroup(
       StudyGroup(
@@ -63,14 +67,36 @@ void main() {
     expect(groups.single.id, id);
     expect(groups.single.notes, 'Before school');
     expect(groups.single.activeStudentCount, 0);
+    expect(groups.single.setupCompleted, isFalse);
+    expect(await repository.completeSetup(id), isTrue);
+    expect((await repository.getGroup(id)).setupCompleted, isTrue);
   });
+
+  test(
+    'creates a guided group once and returns its persisted identifier',
+    () async {
+      final cubit = GroupCubit(repository);
+      final group = await cubit.createGroupForSetup(
+        name: 'Guided group',
+        targetGrade: 'primary_1',
+      );
+      expect(group, isNotNull);
+      expect(group!.id, greaterThan(0));
+      expect(group.setupCompleted, isFalse);
+      expect(await repository.countGroups(), 1);
+      await cubit.close();
+    },
+  );
 
   test('rejects empty required values and duplicate names', () async {
     final cubit = GroupCubit(repository);
     expect(await cubit.saveGroup(name: ' ', targetGrade: '7'), isFalse);
     expect(await cubit.saveGroup(name: 'Morning', targetGrade: ' '), isFalse);
     await addGroup('Morning');
-    expect(await cubit.saveGroup(name: 'Morning', targetGrade: '8'), isFalse);
+    expect(
+      await cubit.saveGroup(name: 'Morning', targetGrade: 'primary_2'),
+      isFalse,
+    );
     expect(cubit.lastSaveWasDuplicate, isTrue);
     await cubit.close();
   });
@@ -99,7 +125,7 @@ void main() {
         StudyGroup(
           id: id,
           name: 'Morning 2',
-          targetGrade: '8',
+          targetGrade: 'primary_2',
           notes: ' ',
           createdAt: created,
           updatedAt: created,
@@ -107,7 +133,7 @@ void main() {
       );
       final updated = await repository.getGroup(id);
       expect(updated.name, 'Morning 2');
-      expect(updated.targetGrade, '8');
+      expect(updated.targetGrade, 'primary_2');
       expect(updated.notes, isNull);
       expect(updated.createdAt, created);
       expect(updated.updatedAt, greaterThanOrEqualTo(created));
@@ -181,10 +207,13 @@ void main() {
   test(
     'searches by group name and target grade; clearing restores all groups',
     () async {
-      await addGroup('Morning', grade: 'Grade 9');
-      await addGroup('Evening', grade: 'Grade 10');
+      await addGroup('Morning', grade: 'preparatory_3');
+      await addGroup('Evening', grade: 'secondary_1');
       expect((await repository.searchGroups('Morn')).single.name, 'Morning');
-      expect((await repository.searchGroups('10')).single.name, 'Evening');
+      expect(
+        (await repository.searchGroups('secondary_1')).single.name,
+        'Evening',
+      );
       expect(await repository.searchGroups(''), hasLength(2));
     },
   );
@@ -335,7 +364,7 @@ void main() {
 StudyGroup _group(String name) => StudyGroup(
   id: 1,
   name: name,
-  targetGrade: '7',
+  targetGrade: 'primary_1',
   notes: null,
   createdAt: 1,
   updatedAt: 1,
@@ -344,6 +373,8 @@ StudyGroup _group(String name) => StudyGroup(
 class _DelayedRepository implements GroupRepository {
   final Map<String, Completer<List<StudyGroup>>> searches = {};
   bool failGroupLoads = false;
+  @override
+  Future<int> countGroups() async => 0;
   @override
   Future<List<StudyGroup>> getGroups() async {
     if (failGroupLoads) throw StateError('database failure');
@@ -369,4 +400,6 @@ class _DelayedRepository implements GroupRepository {
   Future<bool> removeStudent(int groupId, int studentId) async => true;
   @override
   Future<int> deleteGroup(int groupId) async => 1;
+  @override
+  Future<bool> completeSetup(int groupId) async => true;
 }
