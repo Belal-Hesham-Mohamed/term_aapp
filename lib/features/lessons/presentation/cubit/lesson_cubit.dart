@@ -28,7 +28,7 @@ class LessonCubit extends Cubit<LessonState> {
     }
   }
 
-  Future<void> loadUpcomingLessons({required int groupId}) async {
+  Future<void> loadUpcomingLessons({int? groupId}) async {
     final requestId = ++_requestId;
     try {
       final now = clock();

@@ -13,7 +13,6 @@ class StudentLocalDataSource {
   Future<List<Student>> getActiveStudents() async {
     final List<Map<String, dynamic>> rows = await dbHelper.db.query(
       'students',
-      where: 'archived_at IS NULL',
       orderBy: 'name COLLATE NOCASE ASC, duplicate_index ASC, id ASC',
     );
     return rows.map((e) => Student.fromMap(e)).toList();
@@ -37,7 +36,7 @@ class StudentLocalDataSource {
     final List<Map<String, dynamic>> rows = await dbHelper.db.query(
       'students',
       where:
-          "archived_at IS NULL AND (name LIKE ? OR (name || CASE WHEN duplicate_index > 1 THEN ' (' || duplicate_index || ')' ELSE '' END) LIKE ? OR phone LIKE ? OR first_name LIKE ? OR father_name LIKE ? OR family_name LIKE ?)",
+          "name LIKE ? OR (name || CASE WHEN duplicate_index > 1 THEN ' (' || duplicate_index || ')' ELSE '' END) LIKE ? OR phone LIKE ? OR first_name LIKE ? OR father_name LIKE ? OR family_name LIKE ?",
       whereArgs: ['%$q%', '%$q%', '%$q%', '%$q%', '%$q%', '%$q%'],
       orderBy: 'name COLLATE NOCASE ASC, duplicate_index ASC, id ASC',
     );
@@ -101,8 +100,7 @@ class StudentLocalDataSource {
   Future<List<Student>> findByNameAndGrade(String name, String grade) async {
     final rows = await dbHelper.db.query(
       'students',
-      where:
-          'archived_at IS NULL AND name = ? COLLATE NOCASE AND grade = ? COLLATE NOCASE',
+      where: 'name = ? COLLATE NOCASE AND grade = ? COLLATE NOCASE',
       whereArgs: [name.trim(), grade.trim()],
       orderBy: 'id ASC',
     );
@@ -144,7 +142,7 @@ class StudentLocalDataSource {
   }) async {
     final rows = await executor.query(
       'students',
-      where: 'archived_at IS NULL AND grade = ? COLLATE NOCASE',
+      where: 'grade = ? COLLATE NOCASE',
       whereArgs: [grade],
       orderBy: 'created_at ASC, id ASC',
     );
@@ -256,47 +254,52 @@ class StudentLocalDataSource {
     });
   }
 
-  Future<int> archiveStudent(int id) async {
-    final now = DateTime.now().millisecondsSinceEpoch;
-    return dbHelper.db.transaction((txn) async {
-      final rows = await txn.query(
-        'students',
-        where: 'id = ?',
-        whereArgs: [id],
-        limit: 1,
-      );
-      if (rows.isEmpty) return 0;
-      final student = rows.single;
-      final changed = await txn.update(
-        'students',
-        {'archived_at': now, 'updated_at': now},
-        where: 'id = ?',
-        whereArgs: [id],
-      );
-      final first = student['first_name'] as String?;
-      final father = student['father_name'] as String?;
-      final family = student['family_name'] as String?;
-      if (changed > 0 && first != null && father != null && family != null) {
-        await _reindexDuplicateGroup(
-          txn,
-          firstName: first,
-          fatherName: father,
-          familyName: family,
-          grade: student['grade'] as String,
+  Future<int> deleteStudent(int id) async =>
+      dbHelper.db.transaction((txn) async {
+        final existing = await txn.query(
+          'students',
+          where: 'id = ?',
+          whereArgs: [id],
+          limit: 1,
         );
-      } else if (changed > 0 &&
-          first == null &&
-          father == null &&
-          family == null) {
-        await _reindexLegacyDuplicateGroup(
-          txn,
-          name: student['name'] as String,
-          grade: student['grade'] as String,
+        if (existing.isEmpty) return 0;
+        final student = existing.single;
+        await txn.delete(
+          'attendance_records',
+          where: 'student_id = ?',
+          whereArgs: [id],
         );
-      }
-      return changed;
-    });
-  }
+        await txn.delete(
+          'group_students',
+          where: 'student_id = ?',
+          whereArgs: [id],
+        );
+        final deleted = await txn.delete(
+          'students',
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+        if (deleted == 0) return 0;
+        final first = student['first_name'] as String?;
+        final father = student['father_name'] as String?;
+        final family = student['family_name'] as String?;
+        if (first != null && father != null && family != null) {
+          await _reindexDuplicateGroup(
+            txn,
+            firstName: first,
+            fatherName: father,
+            familyName: family,
+            grade: student['grade'] as String,
+          );
+        } else if (first == null && father == null && family == null) {
+          await _reindexLegacyDuplicateGroup(
+            txn,
+            name: student['name'] as String,
+            grade: student['grade'] as String,
+          );
+        }
+        return deleted;
+      });
 
   Future<void> _reindexDuplicateGroup(
     DatabaseExecutor executor, {
@@ -308,7 +311,7 @@ class StudentLocalDataSource {
     final fullName = '$firstName $fatherName $familyName';
     final rows = await executor.query(
       'students',
-      where: 'archived_at IS NULL AND grade = ? COLLATE NOCASE',
+      where: 'grade = ? COLLATE NOCASE',
       whereArgs: [grade],
     );
     final targetParts = [firstName, fatherName, familyName]
@@ -350,7 +353,7 @@ class StudentLocalDataSource {
   }) async {
     final rows = await executor.query(
       'students',
-      where: 'archived_at IS NULL AND grade = ? COLLATE NOCASE',
+      where: 'grade = ? COLLATE NOCASE',
       whereArgs: [grade],
     );
     final target = StudentRules.normalizeName(name);

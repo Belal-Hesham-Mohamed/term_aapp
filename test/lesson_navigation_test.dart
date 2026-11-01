@@ -12,6 +12,7 @@ import 'package:term/features/groups/presentation/cubit/group_cubit.dart';
 import 'package:term/features/lessons/domain/entities/lesson_record.dart';
 import 'package:term/features/lessons/domain/repositories/lesson_repository.dart';
 import 'package:term/features/lessons/presentation/cubit/lesson_cubit.dart';
+import 'package:term/features/lessons/presentation/pages/lessons_page.dart';
 import 'package:term/features/schedules/domain/entities/group_schedule.dart';
 import 'package:term/features/schedules/domain/repositories/schedule_repository.dart';
 import 'package:term/features/schedules/presentation/cubit/schedule_cubit.dart';
@@ -20,7 +21,7 @@ import 'package:term/l10n/app_localizations.dart';
 
 void main() {
   final locator = getIt;
-  final now = DateTime.now();
+  final lessonDate = DateTime(2026, 3, 2);
   final group = StudyGroup(
     id: 7,
     name: 'Physics',
@@ -33,11 +34,8 @@ void main() {
     id: 11,
     groupId: group.id,
     groupName: group.name,
-    scheduledDate: DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).millisecondsSinceEpoch,
+    groupGrade: group.targetGrade,
+    scheduledDate: lessonDate.millisecondsSinceEpoch,
     startTime: '09:00',
     endTime: '10:00',
     isManual: true,
@@ -87,6 +85,60 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('main Lessons page shows the localized empty upcoming state', (
+    tester,
+  ) async {
+    locator.registerFactory<LessonCubit>(
+      () => LessonCubit(
+        _Lessons(lesson, upcomingLessons: const []),
+        clock: () => DateTime(2026, 3, 1, 8),
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: const LessonsPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.text('No upcoming lessons in the next 30 days.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('main Lessons page displays group, grade, weekday, and times', (
+    tester,
+  ) async {
+    locator.registerFactory<LessonCubit>(
+      () => LessonCubit(_Lessons(lesson), clock: () => DateTime(2026, 3, 1, 8)),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: const LessonsPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Physics'), findsOneWidget);
+    expect(find.text('Grade: 10'), findsOneWidget);
+    expect(find.textContaining('Lesson time: 09:00–10:00'), findsOneWidget);
+  });
 }
 
 class _Groups implements GroupRepository {
@@ -110,6 +162,8 @@ class _Groups implements GroupRepository {
   Future<void> addStudents(int groupId, List<int> studentIds) async {}
   @override
   Future<bool> removeStudent(int groupId, int studentId) async => true;
+  @override
+  Future<int> deleteGroup(int groupId) async => 1;
 }
 
 class _Schedules implements ScheduleRepository {
@@ -125,14 +179,16 @@ class _Schedules implements ScheduleRepository {
 
 class _Lessons implements LessonRepository {
   final LessonRecord lesson;
-  _Lessons(this.lesson);
+  final List<LessonRecord>? upcomingLessons;
+  _Lessons(this.lesson, {this.upcomingLessons});
   @override
-  Future<List<LessonRecord>> getLessons({int? groupId}) async => [lesson];
+  Future<List<LessonRecord>> getLessons({int? groupId}) async =>
+      upcomingLessons ?? [lesson];
   @override
   Future<List<LessonRecord>> getUpcomingLessons({
     int? groupId,
     required DateTime from,
-  }) async => [lesson];
+  }) async => upcomingLessons ?? [lesson];
   @override
   Future<int> generateUpcomingLessons(DateTime now) async => 0;
   @override

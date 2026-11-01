@@ -212,17 +212,83 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancel;
 
-  /// No description provided for @archive.
+  /// No description provided for @allGrades.
   ///
   /// In en, this message translates to:
-  /// **'Archive'**
-  String get archive;
+  /// **'All'**
+  String get allGrades;
 
-  /// No description provided for @archiveConfirm.
+  /// No description provided for @today.
   ///
   /// In en, this message translates to:
-  /// **'Archive this student?'**
-  String get archiveConfirm;
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @thisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get thisWeek;
+
+  /// No description provided for @schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get schedule;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @deleteStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete student'**
+  String get deleteStudent;
+
+  /// No description provided for @deleteStudentConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete {studentName} and all associated enrollment and attendance records? This cannot be undone.'**
+  String deleteStudentConfirm(Object studentName);
+
+  /// No description provided for @studentDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Student and associated records deleted.'**
+  String get studentDeleted;
+
+  /// No description provided for @studentDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete the student. No data was changed.'**
+  String get studentDeleteFailed;
+
+  /// No description provided for @deleteGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete group'**
+  String get deleteGroup;
+
+  /// No description provided for @deleteGroupConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete {groupName}, its lessons, schedules, attendance, and enrollments? Students themselves will be kept. This cannot be undone.'**
+  String deleteGroupConfirm(Object groupName);
+
+  /// No description provided for @groupDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Group and its related records deleted.'**
+  String get groupDeleted;
+
+  /// No description provided for @groupDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete the group. No data was changed.'**
+  String get groupDeleteFailed;
 
   /// No description provided for @search.
   ///
@@ -311,7 +377,7 @@ abstract class AppLocalizations {
   /// No description provided for @activeStudents.
   ///
   /// In en, this message translates to:
-  /// **'Active students'**
+  /// **'Students'**
   String get activeStudents;
 
   /// No description provided for @noEnrolledStudents.

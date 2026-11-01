@@ -66,10 +66,47 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cancel => 'إلغاء';
 
   @override
-  String get archive => 'أرشفة';
+  String get allGrades => 'الكل';
 
   @override
-  String get archiveConfirm => 'هل تريد أرشفة هذا الطالب؟';
+  String get today => 'اليوم';
+
+  @override
+  String get thisWeek => 'هذا الأسبوع';
+
+  @override
+  String get schedule => 'الجدول';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get deleteStudent => 'حذف الطالب';
+
+  @override
+  String deleteStudentConfirm(Object studentName) {
+    return 'هل تريد حذف $studentName نهائيًا مع سجلات تسجيله بالمجموعات وحضوره؟ لا يمكن التراجع عن هذا الإجراء.';
+  }
+
+  @override
+  String get studentDeleted => 'تم حذف الطالب والسجلات المرتبطة به.';
+
+  @override
+  String get studentDeleteFailed => 'تعذر حذف الطالب. لم يتم تغيير البيانات.';
+
+  @override
+  String get deleteGroup => 'حذف المجموعة';
+
+  @override
+  String deleteGroupConfirm(Object groupName) {
+    return 'هل تريد حذف $groupName نهائيًا مع دروسها ومواعيدها وحضورها وتسجيلات الطلاب؟ ستبقى سجلات الطلاب. لا يمكن التراجع عن هذا الإجراء.';
+  }
+
+  @override
+  String get groupDeleted => 'تم حذف المجموعة والسجلات المرتبطة بها.';
+
+  @override
+  String get groupDeleteFailed => 'تعذر حذف المجموعة. لم يتم تغيير البيانات.';
 
   @override
   String get search => 'بحث';
@@ -117,7 +154,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get activeStudents => 'الطلاب النشطون';
+  String get activeStudents => 'الطلاب';
 
   @override
   String get noEnrolledStudents => 'لا يوجد طلاب مسجلون في هذه المجموعة.';

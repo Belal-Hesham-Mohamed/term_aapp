@@ -140,50 +140,41 @@ void main() {
   );
 
   test(
-    'adds multiple students, ignores duplicate IDs, excludes archived students, counts active roster',
+    'archived student data remains visible and enrollable after archive UI removal',
     () async {
       final group = await addGroup('Mixed');
       final activeA = await addStudent('A');
       final activeB = await addStudent('B');
       final archived = await addStudent('C', archived: true);
-      expect(await repository.getAvailableStudents(group), hasLength(2));
-      await repository.addStudents(group, [activeA, activeB, activeA]);
-      await expectLater(
-        repository.addStudents(group, [archived]),
-        throwsStateError,
-      );
-      expect(await repository.getEnrolledStudents(group), hasLength(2));
-      expect((await repository.getGroup(group)).activeStudentCount, 2);
+      expect(await repository.getAvailableStudents(group), hasLength(3));
+      await repository.addStudents(group, [
+        activeA,
+        activeB,
+        activeA,
+        archived,
+      ]);
+      expect(await repository.getEnrolledStudents(group), hasLength(3));
+      expect((await repository.getGroup(group)).activeStudentCount, 3);
       expect(await repository.getAvailableStudents(group), isEmpty);
     },
   );
 
   test(
-    'keeps a created student after failed enrollment and allows safe retry',
+    'legacy archive marker does not block enrollment or erase student data',
     () async {
       final group = await addGroup('Retry group');
       final student = await addStudent('Saved student', archived: true);
-      await expectLater(
-        repository.addStudents(group, [student]),
-        throwsStateError,
-      );
-      expect(
-        await database.db.query(
-          'students',
-          where: 'id = ?',
-          whereArgs: [student],
-        ),
-        hasLength(1),
-      );
-      await database.db.update(
-        'students',
-        {'archived_at': null},
-        where: 'id = ?',
-        whereArgs: [student],
-      );
       await repository.addStudents(group, [student]);
       await repository.addStudents(group, [student]);
       expect(await repository.getEnrolledStudents(group), hasLength(1));
+      expect(
+        (await database.db.query(
+          'students',
+          where: 'id = ?',
+          whereArgs: [student],
+        )).single['archived_at'],
+        isNotNull,
+      );
     },
   );
 
@@ -220,6 +211,100 @@ void main() {
     expect(cubit.state, isA<GroupFailure>());
     await cubit.close();
   });
+
+  test(
+    'deleting a group removes only group-owned data and preserves students',
+    () async {
+      final group = await addGroup('Delete me');
+      final otherGroup = await addGroup('Keep me');
+      final sharedStudent = await addStudent('Shared');
+      final enrolledOnlyHere = await addStudent('Keep student');
+      await repository.addStudents(group, [sharedStudent, enrolledOnlyHere]);
+      await repository.addStudents(otherGroup, [sharedStudent]);
+      await database.db.insert('group_schedules', {
+        'group_id': group,
+        'weekday': 1,
+      });
+      final lesson = await database.db.insert('lessons', {
+        'group_id': group,
+        'scheduled_date': 1,
+      });
+      await database.db.insert('attendance_records', {
+        'lesson_id': lesson,
+        'student_id': sharedStudent,
+        'status': 'present',
+        'recorded_at': 1,
+      });
+      expect(await repository.deleteGroup(group), 1);
+      expect(await repository.getGroup(otherGroup), isA<StudyGroup>());
+      expect(
+        await database.db.query(
+          'group_schedules',
+          where: 'group_id = ?',
+          whereArgs: [group],
+        ),
+        isEmpty,
+      );
+      expect(
+        await database.db.query(
+          'lessons',
+          where: 'group_id = ?',
+          whereArgs: [group],
+        ),
+        isEmpty,
+      );
+      expect(await database.db.query('attendance_records'), isEmpty);
+      expect(
+        await database.db.query(
+          'group_students',
+          where: 'group_id = ?',
+          whereArgs: [group],
+        ),
+        isEmpty,
+      );
+      expect(await database.db.query('students'), hasLength(2));
+      expect(await repository.getEnrolledStudents(otherGroup), hasLength(1));
+    },
+  );
+
+  test(
+    'failed group deletion rolls back previously removed dependents',
+    () async {
+      final group = await addGroup('Protected');
+      final student = await addStudent('Student');
+      await repository.addStudents(group, [student]);
+      final lesson = await database.db.insert('lessons', {
+        'group_id': group,
+        'scheduled_date': 1,
+      });
+      await database.db.insert('attendance_records', {
+        'lesson_id': lesson,
+        'student_id': student,
+        'status': 'present',
+        'recorded_at': 1,
+      });
+      await database.db.execute(
+        '''CREATE TRIGGER block_schedule_delete BEFORE DELETE ON group_schedules BEGIN SELECT RAISE(ABORT, 'blocked'); END''',
+      );
+      await database.db.insert('group_schedules', {
+        'group_id': group,
+        'weekday': 1,
+      });
+      await expectLater(repository.deleteGroup(group), throwsA(anything));
+      expect(await repository.getGroup(group), isA<StudyGroup>());
+      expect(
+        await database.db.query(
+          'lessons',
+          where: 'group_id = ?',
+          whereArgs: [group],
+        ),
+        hasLength(1),
+      );
+      expect(await database.db.query('attendance_records'), hasLength(1));
+      expect(await database.db.query('group_students'), hasLength(1));
+      expect(await database.db.query('group_schedules'), hasLength(1));
+    },
+  );
 
   test(
     'dependency registration constructs a GroupCubit from the shared database helper',
@@ -282,4 +367,6 @@ class _DelayedRepository implements GroupRepository {
   Future<void> addStudents(int groupId, List<int> studentIds) async {}
   @override
   Future<bool> removeStudent(int groupId, int studentId) async => true;
+  @override
+  Future<int> deleteGroup(int groupId) async => 1;
 }

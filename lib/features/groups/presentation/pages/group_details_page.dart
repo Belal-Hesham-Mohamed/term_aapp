@@ -32,6 +32,7 @@ class _GroupDetailsView extends StatefulWidget {
 
 class _GroupDetailsViewState extends State<_GroupDetailsView> {
   int _scheduleRefreshKey = 0;
+  bool _deleting = false;
 
   void _refreshUpcomingLessons() {
     setState(() => _scheduleRefreshKey++);
@@ -64,6 +65,44 @@ class _GroupDetailsViewState extends State<_GroupDetailsView> {
     }
   }
 
+  Future<void> _deleteGroup(
+    BuildContext context,
+    GroupDetailsLoaded state,
+  ) async {
+    if (_deleting) return;
+    final l10n = AppLocalizations.of(context)!;
+    final cubit = context.read<GroupCubit>();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.deleteGroup),
+        content: Text(l10n.deleteGroupConfirm(state.group.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.deleteGroup),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    setState(() => _deleting = true);
+    final deleted = await cubit.deleteGroup(widget.groupId);
+    if (!context.mounted) return;
+    if (deleted) {
+      Navigator.pop(context, true);
+    } else {
+      setState(() => _deleting = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.groupDeleteFailed)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -78,6 +117,24 @@ class _GroupDetailsViewState extends State<_GroupDetailsView> {
               if (state is GroupDetailsLoaded) _edit(context, state);
             },
             icon: const Icon(Icons.edit_outlined),
+          ),
+          IconButton(
+            tooltip: l10n.deleteGroup,
+            onPressed: _deleting
+                ? null
+                : () {
+                    final state = context.read<GroupCubit>().state;
+                    if (state is GroupDetailsLoaded) {
+                      _deleteGroup(context, state);
+                    }
+                  },
+            icon: _deleting
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.delete_outline),
           ),
         ],
       ),

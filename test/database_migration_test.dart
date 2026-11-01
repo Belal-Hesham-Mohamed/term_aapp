@@ -77,4 +77,46 @@ void main() {
       await db.close();
     },
   );
+
+  test(
+    'version 1 partially migrated student schema skips existing columns',
+    () async {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+      final db = await openDatabase(
+        inMemoryDatabasePath,
+        version: 1,
+        onCreate: (db, _) async {
+          await db.execute(
+            '''CREATE TABLE students (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, grade TEXT NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, first_name TEXT)''',
+          );
+          await db.insert('students', {
+            'name': 'Existing student',
+            'grade': 'primary_1',
+            'created_at': 1,
+            'updated_at': 1,
+            'first_name': 'Existing',
+          });
+        },
+      );
+      await DatabaseHelper.migrate(db, 1, 2);
+      final columns = (await db.rawQuery(
+        'PRAGMA table_info(students)',
+      )).map((row) => row['name']).toSet();
+      expect(
+        columns,
+        containsAll([
+          'first_name',
+          'father_name',
+          'family_name',
+          'duplicate_index',
+        ]),
+      );
+      final student = (await db.query('students')).single;
+      expect(student['name'], 'Existing student');
+      expect(student['first_name'], 'Existing');
+      expect(student['duplicate_index'], 1);
+      await db.close();
+    },
+  );
 }

@@ -184,12 +184,22 @@ void main() {
     expect(original.copyWith(name: 'Changed').age, original.age);
   });
 
-  test('archive excludes student from active results', () async {
-    final id = await repository.addStudent(makeStudent());
-    await repository.archiveStudent(id);
-    expect(await repository.getActiveStudents(), isEmpty);
-    expect(await repository.searchStudents('Mona'), isEmpty);
-  });
+  test(
+    'existing archive metadata is retained and does not hide students',
+    () async {
+      final id = await repository.addStudent(makeStudent());
+      final archivedAt = DateTime.now().millisecondsSinceEpoch;
+      await db.db.update(
+        'students',
+        {'archived_at': archivedAt},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      expect(await repository.getActiveStudents(), hasLength(1));
+      expect(await repository.searchStudents('Mona'), hasLength(1));
+      expect((await repository.getStudentById(id))!.archivedAt, archivedAt);
+    },
+  );
 
   test(
     'search matches name and phone; empty query returns all active students',
@@ -213,6 +223,55 @@ void main() {
         'Mona Ali Ahmed',
       );
       expect(await repository.searchStudents(''), hasLength(2));
+    },
+  );
+
+  test(
+    'student grade filtering combines with search and preserves search when grade changes',
+    () async {
+      await repository.addStudent(
+        makeStudent(
+          name: 'Ahmed Ali Hassan',
+          firstName: 'Ahmed',
+          fatherName: 'Ali',
+          familyName: 'Hassan',
+          grade: 'primary_1',
+        ),
+      );
+      await repository.addStudent(
+        makeStudent(
+          name: 'Ahmed Samir Hassan',
+          firstName: 'Ahmed',
+          fatherName: 'Samir',
+          familyName: 'Hassan',
+          grade: 'primary_2',
+        ),
+      );
+      await repository.addStudent(
+        makeStudent(
+          name: 'Mona Ali Youssef',
+          familyName: 'Youssef',
+          grade: 'primary_1',
+        ),
+      );
+      final cubit = StudentCubit(repository);
+      await cubit.loadStudents();
+      await cubit.selectGrade('primary_1');
+      expect((cubit.state as StudentLoaded).students, hasLength(2));
+      await cubit.searchStudents('Ahmed');
+      await Future<void>.delayed(const Duration(milliseconds: 320));
+      expect(
+        (cubit.state as StudentLoaded).students.map((student) => student.name),
+        ['Ahmed Ali Hassan'],
+      );
+      await cubit.selectGrade('primary_2');
+      expect(
+        (cubit.state as StudentLoaded).students.map((student) => student.name),
+        ['Ahmed Samir Hassan'],
+      );
+      await cubit.selectGrade(null);
+      expect((cubit.state as StudentLoaded).students, hasLength(2));
+      await cubit.close();
     },
   );
 
@@ -345,21 +404,125 @@ void main() {
     },
   );
 
-  test('archiving a duplicate compacts active display numbering', () async {
-    final ids = <int>[];
-    for (var i = 0; i < 3; i++) {
-      ids.add(await repository.addStudent(makeStudent()));
-    }
-    expect(
-      (await repository.getActiveStudents()).map((s) => s.duplicateIndex),
-      [1, 2, 3],
-    );
-    await repository.archiveStudent(ids[1]);
-    expect(
-      (await repository.getActiveStudents()).map((s) => s.duplicateIndex),
-      [1, 2],
-    );
-  });
+  test(
+    'permanent deletion compacts remaining duplicate display numbering',
+    () async {
+      final ids = <int>[];
+      for (var i = 0; i < 3; i++) {
+        ids.add(await repository.addStudent(makeStudent()));
+      }
+      expect(
+        (await repository.getActiveStudents()).map((s) => s.duplicateIndex),
+        [1, 2, 3],
+      );
+      await repository.deleteStudent(ids[1]);
+      expect(
+        (await repository.getActiveStudents()).map((s) => s.duplicateIndex),
+        [1, 2],
+      );
+    },
+  );
+
+  test(
+    'deleting a student removes enrollments and attendance but keeps other data',
+    () async {
+      final studentId = await repository.addStudent(makeStudent());
+      final otherStudentId = await repository.addStudent(
+        makeStudent(name: 'Sara Ali Ahmed', firstName: 'Sara'),
+      );
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final groupId = await db.db.insert('groups', {
+        'name': 'Shared group',
+        'target_grade': 'primary_1',
+        'created_at': now,
+        'updated_at': now,
+      });
+      await db.db.insert('group_students', {
+        'group_id': groupId,
+        'student_id': studentId,
+        'enrolled_at': now,
+      });
+      await db.db.insert('group_students', {
+        'group_id': groupId,
+        'student_id': otherStudentId,
+        'enrolled_at': now,
+      });
+      final lessonId = await db.db.insert('lessons', {
+        'group_id': groupId,
+        'scheduled_date': now,
+      });
+      await db.db.insert('attendance_records', {
+        'lesson_id': lessonId,
+        'student_id': studentId,
+        'status': 'present',
+        'recorded_at': now,
+      });
+      await db.db.insert('attendance_records', {
+        'lesson_id': lessonId,
+        'student_id': otherStudentId,
+        'status': 'absent',
+        'recorded_at': now,
+      });
+
+      expect(await repository.deleteStudent(studentId), 1);
+      expect(await repository.getStudentById(studentId), isNull);
+      expect(await repository.getStudentById(otherStudentId), isNotNull);
+      expect(
+        await db.db.query(
+          'group_students',
+          where: 'student_id = ?',
+          whereArgs: [studentId],
+        ),
+        isEmpty,
+      );
+      expect(
+        (await db.db.query('group_students')).single['student_id'],
+        otherStudentId,
+      );
+      expect(
+        (await db.db.query('attendance_records')).single['student_id'],
+        otherStudentId,
+      );
+      expect(await db.db.query('groups'), hasLength(1));
+      expect(await db.db.query('lessons'), hasLength(1));
+    },
+  );
+
+  test(
+    'failed student deletion rolls back enrollment and attendance removal',
+    () async {
+      final studentId = await repository.addStudent(makeStudent());
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final groupId = await db.db.insert('groups', {
+        'name': 'Protected',
+        'target_grade': 'primary_1',
+        'created_at': now,
+        'updated_at': now,
+      });
+      await db.db.insert('group_students', {
+        'group_id': groupId,
+        'student_id': studentId,
+        'enrolled_at': now,
+      });
+      final lessonId = await db.db.insert('lessons', {
+        'group_id': groupId,
+        'scheduled_date': now,
+      });
+      await db.db.insert('attendance_records', {
+        'lesson_id': lessonId,
+        'student_id': studentId,
+        'status': 'present',
+        'recorded_at': now,
+      });
+      await db.db.execute(
+        '''CREATE TRIGGER block_student_delete BEFORE DELETE ON students BEGIN SELECT RAISE(ABORT, 'blocked'); END''',
+      );
+      await expectLater(repository.deleteStudent(studentId), throwsA(anything));
+      expect(await repository.getStudentById(studentId), isNotNull);
+      expect(await db.db.query('group_students'), hasLength(1));
+      expect(await db.db.query('attendance_records'), hasLength(1));
+    },
+  );
 
   test(
     'changing grade moves student into the correct duplicate numbering group',
@@ -400,5 +563,5 @@ class _ControlledRepository implements StudentRepository {
   @override
   Future<int> updateStudent(Student student) async => 1;
   @override
-  Future<int> archiveStudent(int id) async => 1;
+  Future<int> deleteStudent(int id) async => 1;
 }

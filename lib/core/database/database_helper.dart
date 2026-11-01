@@ -58,12 +58,24 @@ class DatabaseHelper {
     int newVersion,
   ) async {
     if (oldVersion < 2) {
-      await db.execute('ALTER TABLE students ADD COLUMN first_name TEXT');
-      await db.execute('ALTER TABLE students ADD COLUMN father_name TEXT');
-      await db.execute('ALTER TABLE students ADD COLUMN family_name TEXT');
-      await db.execute(
-        'ALTER TABLE students ADD COLUMN duplicate_index INTEGER NOT NULL DEFAULT 1',
-      );
+      final columns = (await db.rawQuery('PRAGMA table_info(students)'))
+          .map((column) => column['name'] as String)
+          .toSet();
+
+      const additions = <String, String>{
+        'first_name': 'TEXT',
+        'father_name': 'TEXT',
+        'family_name': 'TEXT',
+        'duplicate_index': 'INTEGER NOT NULL DEFAULT 1',
+      };
+
+      for (final entry in additions.entries) {
+        if (columns.add(entry.key)) {
+          await db.execute(
+            'ALTER TABLE students ADD COLUMN ${entry.key} ${entry.value}',
+          );
+        }
+      }
     }
   }
 }

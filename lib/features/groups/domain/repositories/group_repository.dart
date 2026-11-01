@@ -11,6 +11,7 @@ abstract class GroupRepository {
   Future<void> updateGroup(StudyGroup group);
   Future<void> addStudents(int groupId, List<int> studentIds);
   Future<bool> removeStudent(int groupId, int studentId);
+  Future<int> deleteGroup(int groupId);
 }
 
 class DuplicateGroupNameException implements Exception {}

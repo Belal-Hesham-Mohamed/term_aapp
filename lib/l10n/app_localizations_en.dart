@@ -66,10 +66,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel => 'Cancel';
 
   @override
-  String get archive => 'Archive';
+  String get allGrades => 'All';
 
   @override
-  String get archiveConfirm => 'Archive this student?';
+  String get today => 'Today';
+
+  @override
+  String get thisWeek => 'This Week';
+
+  @override
+  String get schedule => 'Schedule';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get deleteStudent => 'Delete student';
+
+  @override
+  String deleteStudentConfirm(Object studentName) {
+    return 'Permanently delete $studentName and all associated enrollment and attendance records? This cannot be undone.';
+  }
+
+  @override
+  String get studentDeleted => 'Student and associated records deleted.';
+
+  @override
+  String get studentDeleteFailed =>
+      'Could not delete the student. No data was changed.';
+
+  @override
+  String get deleteGroup => 'Delete group';
+
+  @override
+  String deleteGroupConfirm(Object groupName) {
+    return 'Permanently delete $groupName, its lessons, schedules, attendance, and enrollments? Students themselves will be kept. This cannot be undone.';
+  }
+
+  @override
+  String get groupDeleted => 'Group and its related records deleted.';
+
+  @override
+  String get groupDeleteFailed =>
+      'Could not delete the group. No data was changed.';
 
   @override
   String get search => 'Search';
@@ -117,7 +156,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get activeStudents => 'Active students';
+  String get activeStudents => 'Students';
 
   @override
   String get noEnrolledStudents => 'No students are enrolled in this group.';

@@ -59,4 +59,6 @@ class _EmptyGroupRepository implements GroupRepository {
   Future<void> addStudents(int groupId, List<int> studentIds) async {}
   @override
   Future<bool> removeStudent(int groupId, int studentId) async => true;
+  @override
+  Future<int> deleteGroup(int groupId) async => 1;
 }

@@ -55,17 +55,20 @@ void main() {
   LessonRecord lesson({
     int id = 0,
     int? date,
-    String start = '09:00',
-    String end = '10:00',
+    int? lessonGroupId,
+    String? start = '09:00',
+    String? end = '10:00',
+    bool isCanceled = false,
   }) => LessonRecord(
     id: id,
-    groupId: groupId,
+    groupId: lessonGroupId ?? groupId,
     groupName: 'Physics',
+    groupGrade: '10',
     scheduledDate: date ?? DateTime(2026, 4, 1).millisecondsSinceEpoch,
     startTime: start,
     endTime: end,
     isManual: true,
-    isCanceled: false,
+    isCanceled: isCanceled,
     cancellationReason: null,
   );
 
@@ -403,7 +406,7 @@ void main() {
   );
 
   test(
-    'upcoming query orders nearest first and includes canceled lessons',
+    'upcoming query orders nearest first and excludes canceled or untimed lessons',
     () async {
       final passedToday = await lessons.createLesson(
         lesson(
@@ -423,19 +426,28 @@ void main() {
         lesson(
           date: DateTime(2026, 3, 8).millisecondsSinceEpoch,
           start: '11:00',
+          end: '12:00',
         ),
       );
       final nearest = await lessons.createLesson(
         lesson(
           date: DateTime(2026, 3, 3).millisecondsSinceEpoch,
           start: '09:00',
+          isCanceled: true,
         ),
       );
-      await database.db.update(
-        'lessons',
-        {'is_canceled': 1},
-        where: 'id = ?',
-        whereArgs: [nearest],
+      final missingTime = await lessons.createLesson(
+        lesson(date: DateTime(2026, 3, 4).millisecondsSinceEpoch, start: null),
+      );
+      final missingEndTime = await lessons.createLesson(
+        lesson(date: DateTime(2026, 3, 5).millisecondsSinceEpoch, end: null),
+      );
+      final invalidTime = await lessons.createLesson(
+        lesson(
+          date: DateTime(2026, 3, 6).millisecondsSinceEpoch,
+          start: '28:00',
+          end: '29:00',
+        ),
       );
       await lessons.createLesson(
         lesson(date: DateTime(2026, 2, 28).millisecondsSinceEpoch),
@@ -444,13 +456,76 @@ void main() {
         groupId: groupId,
         from: DateTime(2026, 3, 1, 18),
       );
-      expect(result.map((item) => item.id).toList(), [
-        laterToday,
-        nearest,
-        later,
-      ]);
+      expect(result.map((item) => item.id).toList(), [laterToday, later]);
       expect(result.first.id, isNot(passedToday));
-      expect(result[1].isCanceled, isTrue);
+      expect(result.map((item) => item.id), isNot(contains(nearest)));
+      expect(result.map((item) => item.id), isNot(contains(missingTime)));
+      expect(result.map((item) => item.id), isNot(contains(missingEndTime)));
+      expect(result.map((item) => item.id), isNot(contains(invalidTime)));
+      expect(result.every((item) => !item.isCanceled), isTrue);
+    },
+  );
+
+  test(
+    'global upcoming lessons combine groups and sort by local date and start time',
+    () async {
+      final secondGroupId = await database.db.insert('groups', {
+        'name': 'Chemistry',
+        'target_grade': 'Third Preparatory',
+        'created_at': 1,
+        'updated_at': 1,
+      });
+      final firstDate = DateTime(2026, 3, 2).millisecondsSinceEpoch;
+      final secondDate = DateTime(2026, 3, 3).millisecondsSinceEpoch;
+      final physicsLate = await lessons.createLesson(
+        lesson(date: firstDate, start: '16:00', end: '17:00'),
+      );
+      final chemistry = await lessons.createLesson(
+        lesson(
+          lessonGroupId: secondGroupId,
+          date: secondDate,
+          start: '15:00',
+          end: '16:00',
+        ),
+      );
+      final physicsEarly = await lessons.createLesson(
+        lesson(date: firstDate, start: '15:00', end: '16:00'),
+      );
+
+      final allGroups = await lessons.getUpcomingLessons(
+        from: DateTime(2026, 3, 1, 8),
+      );
+      expect(allGroups.map((item) => item.id).toList(), [
+        physicsEarly,
+        physicsLate,
+        chemistry,
+      ]);
+      expect(allGroups.first.groupName, 'Physics');
+      expect(allGroups.first.groupGrade, '10');
+      expect(allGroups.last.groupName, 'Chemistry');
+      expect(allGroups.last.groupGrade, 'Third Preparatory');
+
+      final oneGroup = await lessons.getUpcomingLessons(
+        groupId: secondGroupId,
+        from: DateTime(2026, 3, 1, 8),
+      );
+      expect(oneGroup.map((item) => item.id), [chemistry]);
+    },
+  );
+
+  test(
+    'lesson Cubit loads generated upcoming lessons across every group',
+    () async {
+      final lessonId = await lessons.createLesson(
+        lesson(date: DateTime(2026, 3, 2).millisecondsSinceEpoch),
+      );
+      final cubit = LessonCubit(lessons, clock: () => DateTime(2026, 3, 1, 8));
+      await cubit.loadUpcomingLessons();
+      expect(cubit.state, isA<LessonListLoaded>());
+      expect((cubit.state as LessonListLoaded).lessons.map((item) => item.id), [
+        lessonId,
+      ]);
+      await cubit.close();
     },
   );
 

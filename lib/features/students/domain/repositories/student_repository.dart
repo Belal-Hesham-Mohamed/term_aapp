@@ -15,5 +15,5 @@ abstract class StudentRepository {
     required String grade,
   });
   Future<int> updateStudent(Student student);
-  Future<int> archiveStudent(int id);
+  Future<int> deleteStudent(int id);
 }

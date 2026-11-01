@@ -99,7 +99,7 @@ class _GroupsViewState extends State<_GroupsView> {
                         '${l10n.targetGrade}: ${group.targetGrade} | ${l10n.activeStudents}: ${group.activeStudentCount}',
                       ),
                       onTap: () async {
-                        await Navigator.push<void>(
+                        final deleted = await Navigator.push<bool>(
                           context,
                           MaterialPageRoute(
                             builder: (_) => GroupDetailsPage(groupId: group.id),
@@ -107,6 +107,11 @@ class _GroupsViewState extends State<_GroupsView> {
                         );
                         if (context.mounted) {
                           context.read<GroupCubit>().loadGroups();
+                          if (deleted == true) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.groupDeleted)),
+                            );
+                          }
                         }
                       },
                       trailing: IconButton(

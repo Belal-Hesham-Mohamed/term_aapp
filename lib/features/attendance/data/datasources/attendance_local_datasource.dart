@@ -15,7 +15,7 @@ class AttendanceLocalDataSource {
       WHERE EXISTS (
         SELECT 1 FROM lessons l
         INNER JOIN group_students gs ON gs.group_id = l.group_id
-        WHERE l.id = ? AND gs.student_id = s.id AND s.archived_at IS NULL
+        WHERE l.id = ? AND gs.student_id = s.id
       ) OR ar.id IS NOT NULL
       ORDER BY s.name COLLATE NOCASE ASC, s.duplicate_index ASC, s.id ASC
     ''',

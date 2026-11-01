@@ -2,6 +2,7 @@ class LessonRecord {
   final int id;
   final int groupId;
   final String groupName;
+  final String groupGrade;
   final int scheduledDate;
   final String? startTime;
   final String? endTime;
@@ -13,6 +14,7 @@ class LessonRecord {
     required this.id,
     required this.groupId,
     required this.groupName,
+    this.groupGrade = '',
     required this.scheduledDate,
     required this.startTime,
     required this.endTime,
@@ -25,6 +27,7 @@ class LessonRecord {
     id: map['id'] as int,
     groupId: map['group_id'] as int,
     groupName: map['group_name'] as String? ?? '',
+    groupGrade: map['group_grade'] as String? ?? '',
     scheduledDate: map['scheduled_date'] as int,
     startTime: map['start_time'] as String?,
     endTime: map['end_time'] as String?,

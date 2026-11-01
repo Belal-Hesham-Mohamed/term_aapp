@@ -14,8 +14,7 @@ class GroupLocalDataSource {
     final trimmed = query.trim();
     final rows = await dbHelper.db.rawQuery(
       '''
-      SELECT g.*, COUNT(DISTINCT CASE WHEN s.archived_at IS NULL THEN s.id END)
-        AS active_student_count
+      SELECT g.*, COUNT(DISTINCT s.id) AS active_student_count
       FROM groups g
       LEFT JOIN group_students gs ON gs.group_id = g.id
       LEFT JOIN students s ON s.id = gs.student_id
@@ -31,8 +30,7 @@ class GroupLocalDataSource {
   Future<StudyGroup> getGroup(int groupId) async {
     final rows = await dbHelper.db.rawQuery(
       '''
-      SELECT g.*, COUNT(DISTINCT CASE WHEN s.archived_at IS NULL THEN s.id END)
-        AS active_student_count
+      SELECT g.*, COUNT(DISTINCT s.id) AS active_student_count
       FROM groups g
       LEFT JOIN group_students gs ON gs.group_id = g.id
       LEFT JOIN students s ON s.id = gs.student_id
@@ -49,7 +47,7 @@ class GroupLocalDataSource {
       '''
       SELECT s.* FROM students s
       INNER JOIN group_students gs ON gs.student_id = s.id
-      WHERE gs.group_id = ? AND s.archived_at IS NULL
+      WHERE gs.group_id = ?
       ORDER BY s.name COLLATE NOCASE ASC, s.duplicate_index ASC, s.id ASC
     ''',
       [groupId],
@@ -61,8 +59,7 @@ class GroupLocalDataSource {
     final rows = await dbHelper.db.rawQuery(
       '''
       SELECT s.* FROM students s
-      WHERE s.archived_at IS NULL
-        AND NOT EXISTS (
+      WHERE NOT EXISTS (
           SELECT 1 FROM group_students gs
           WHERE gs.group_id = ? AND gs.student_id = s.id
         )
@@ -127,7 +124,7 @@ class GroupLocalDataSource {
         final activeStudent = await txn.query(
           'students',
           columns: ['id'],
-          where: 'id = ? AND archived_at IS NULL',
+          where: 'id = ?',
           whereArgs: [studentId],
           limit: 1,
         );
@@ -150,6 +147,36 @@ class GroupLocalDataSource {
         whereArgs: [groupId, studentId],
       ) >
       0;
+
+  Future<int> deleteGroup(int groupId) async => dbHelper.db.transaction((
+    txn,
+  ) async {
+    final rows = await txn.query(
+      'groups',
+      columns: ['id'],
+      where: 'id = ?',
+      whereArgs: [groupId],
+      limit: 1,
+    );
+    if (rows.isEmpty) return 0;
+    await txn.delete(
+      'attendance_records',
+      where: 'lesson_id IN (SELECT id FROM lessons WHERE group_id = ?)',
+      whereArgs: [groupId],
+    );
+    await txn.delete('lessons', where: 'group_id = ?', whereArgs: [groupId]);
+    await txn.delete(
+      'group_schedules',
+      where: 'group_id = ?',
+      whereArgs: [groupId],
+    );
+    await txn.delete(
+      'group_students',
+      where: 'group_id = ?',
+      whereArgs: [groupId],
+    );
+    return txn.delete('groups', where: 'id = ?', whereArgs: [groupId]);
+  });
 
   String? _cleanNotes(String? notes) {
     final trimmed = notes?.trim();

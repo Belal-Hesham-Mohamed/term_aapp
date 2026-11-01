@@ -44,5 +44,5 @@ class StudentRepositoryImpl implements StudentRepository {
       dataSource.updateStudent(student);
 
   @override
-  Future<int> archiveStudent(int id) => dataSource.archiveStudent(id);
+  Future<int> deleteStudent(int id) => dataSource.deleteStudent(id);
 }

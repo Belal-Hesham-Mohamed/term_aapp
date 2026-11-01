@@ -8,6 +8,7 @@ import '../../../../core/di/injection.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'student_form_page.dart';
 import '../student_labels.dart';
+import '../../domain/student_rules.dart';
 
 class StudentListPage extends StatelessWidget {
   const StudentListPage({super.key});
@@ -49,6 +50,8 @@ class _StudentListBody extends StatefulWidget {
 class _StudentListBodyState extends State<_StudentListBody> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
+  String? _selectedGrade;
+  final Set<int> _deletingStudentIds = {};
 
   @override
   void dispose() {
@@ -74,6 +77,18 @@ class _StudentListBodyState extends State<_StudentListBody> {
               setState(() => _query = value);
               context.read<StudentCubit>().searchStudents(value);
             },
+          ),
+        ),
+        SizedBox(
+          height: 52,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              _gradeChip(l10n.allGrades, null, l10n),
+              ...StudentRules.gradeIds.map(
+                (grade) => _gradeChip(localizedGrade(l10n, grade), grade, l10n),
+              ),
+            ],
           ),
         ),
         Expanded(
@@ -111,31 +126,71 @@ class _StudentListBodyState extends State<_StudentListBody> {
                         }
                       },
                       trailing: IconButton(
-                        icon: const Icon(Icons.archive_outlined),
-                        onPressed: () async {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: Text(l10n.archive),
-                              content: Text(l10n.archiveConfirm),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx, false),
-                                  child: Text(l10n.cancel),
+                        tooltip: l10n.deleteStudent,
+                        icon: _deletingStudentIds.contains(student.id)
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
                                 ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx, true),
-                                  child: Text(l10n.archive),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (confirm == true && context.mounted) {
-                            await context.read<StudentCubit>().archiveStudent(
-                              student.id,
-                            );
-                          }
-                        },
+                              )
+                            : const Icon(Icons.delete_outline),
+                        onPressed: _deletingStudentIds.contains(student.id)
+                            ? null
+                            : () async {
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    title: Text(l10n.deleteStudent),
+                                    content: Text(
+                                      l10n.deleteStudentConfirm(
+                                        student.displayName,
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(ctx, false),
+                                        child: Text(l10n.cancel),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(ctx, true),
+                                        child: Text(l10n.delete),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                if (confirm == true && context.mounted) {
+                                  setState(
+                                    () => _deletingStudentIds.add(student.id),
+                                  );
+                                  final deleted = await context
+                                      .read<StudentCubit>()
+                                      .deleteStudent(student.id);
+                                  if (context.mounted) {
+                                    setState(
+                                      () => _deletingStudentIds.remove(
+                                        student.id,
+                                      ),
+                                    );
+                                  }
+                                  if (deleted && context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(l10n.studentDeleted),
+                                      ),
+                                    );
+                                  } else if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(l10n.studentDeleteFailed),
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
                       ),
                     );
                   },
@@ -150,4 +205,17 @@ class _StudentListBodyState extends State<_StudentListBody> {
       ],
     );
   }
+
+  Widget _gradeChip(String label, String? grade, AppLocalizations l10n) =>
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: ChoiceChip(
+          label: Text(label),
+          selected: _selectedGrade == grade,
+          onSelected: (_) {
+            setState(() => _selectedGrade = grade);
+            context.read<StudentCubit>().selectGrade(grade);
+          },
+        ),
+      );
 }

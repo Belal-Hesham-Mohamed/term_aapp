@@ -12,7 +12,9 @@ class StudentCubit extends Cubit<StudentState> {
   final StudentRepository repository;
   Timer? _searchTimer;
   String _query = '';
+  String? _selectedGrade;
   int _requestId = 0;
+  bool _deleting = false;
 
   StudentCubit(this.repository) : super(StudentLoading()) {
     loadStudents();
@@ -25,7 +27,9 @@ class StudentCubit extends Cubit<StudentState> {
       final students = query.isEmpty
           ? await repository.getActiveStudents()
           : await repository.searchStudents(query);
-      if (!isClosed && requestId == _requestId) emit(StudentLoaded(students));
+      if (!isClosed && requestId == _requestId) {
+        emit(StudentLoaded(_filterGrade(students)));
+      }
     } catch (e) {
       if (!isClosed && requestId == _requestId) {
         emit(StudentError(e.toString()));
@@ -47,18 +51,30 @@ class StudentCubit extends Cubit<StudentState> {
     });
   }
 
+  Future<void> selectGrade(String? grade) async {
+    _selectedGrade = grade;
+    final requestId = ++_requestId;
+    await _loadForQuery(requestId, _query);
+  }
+
   Future<void> _loadForQuery(int requestId, String query) async {
     try {
       final students = query.isEmpty
           ? await repository.getActiveStudents()
           : await repository.searchStudents(query);
-      if (!isClosed && requestId == _requestId) emit(StudentLoaded(students));
+      if (!isClosed && requestId == _requestId) {
+        emit(StudentLoaded(_filterGrade(students)));
+      }
     } catch (e) {
       if (!isClosed && requestId == _requestId) {
         emit(StudentError(e.toString()));
       }
     }
   }
+
+  List<Student> _filterGrade(List<Student> students) => _selectedGrade == null
+      ? students
+      : students.where((student) => student.grade == _selectedGrade).toList();
 
   Future<Student?> createStudent({
     required String firstName,
@@ -175,14 +191,18 @@ class StudentCubit extends Cubit<StudentState> {
     }
   }
 
-  Future<bool> archiveStudent(int id) async {
+  Future<bool> deleteStudent(int id) async {
+    if (_deleting) return false;
+    _deleting = true;
     try {
-      await repository.archiveStudent(id);
+      final deleted = await repository.deleteStudent(id);
       await loadStudents();
-      return true;
+      return deleted > 0;
     } catch (e) {
-      emit(StudentError(e.toString()));
+      await loadStudents();
       return false;
+    } finally {
+      _deleting = false;
     }
   }
 

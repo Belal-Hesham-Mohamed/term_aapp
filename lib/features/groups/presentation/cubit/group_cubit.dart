@@ -12,6 +12,7 @@ class GroupCubit extends Cubit<GroupState> {
   String _query = '';
   int _listRequestId = 0;
   bool _saving = false;
+  bool _deleting = false;
   bool lastSaveWasDuplicate = false;
 
   GroupCubit(this.repository) : super(GroupLoading());
@@ -138,6 +139,20 @@ class GroupCubit extends Cubit<GroupState> {
     } catch (error) {
       if (!isClosed) emit(GroupFailure(error.toString()));
       return false;
+    }
+  }
+
+  Future<bool> deleteGroup(int groupId) async {
+    if (_deleting) return false;
+    _deleting = true;
+    try {
+      final deleted = await repository.deleteGroup(groupId);
+      if (deleted > 0) await loadGroups();
+      return deleted > 0;
+    } catch (error) {
+      return false;
+    } finally {
+      _deleting = false;
     }
   }
 

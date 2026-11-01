@@ -11,7 +11,7 @@ class LessonLocalDataSource {
 
   Future<List<LessonRecord>> getLessons({int? groupId}) async {
     final rows = await dbHelper.db.rawQuery(
-      '''SELECT l.*, g.name AS group_name FROM lessons l
+      '''SELECT l.*, g.name AS group_name, g.target_grade AS group_grade FROM lessons l
          INNER JOIN groups g ON g.id = l.group_id
          ${groupId == null ? '' : 'WHERE l.group_id = ?'}
          ORDER BY l.scheduled_date DESC, l.start_time DESC, l.id DESC''',
@@ -32,17 +32,28 @@ class LessonLocalDataSource {
     final nowTime =
         '${from.hour.toString().padLeft(2, '0')}:${from.minute.toString().padLeft(2, '0')}';
     final rows = await dbHelper.db.rawQuery(
-      '''SELECT l.*, g.name AS group_name FROM lessons l
+      '''SELECT l.*, g.name AS group_name, g.target_grade AS group_grade FROM lessons l
          INNER JOIN groups g ON g.id = l.group_id
-         WHERE (l.scheduled_date > ? OR
-           (l.scheduled_date = ? AND (l.start_time IS NULL OR l.start_time >= ?)))
+         WHERE l.is_canceled = 0
+           AND l.start_time IS NOT NULL AND TRIM(l.start_time) != ''
+           AND l.end_time IS NOT NULL AND TRIM(l.end_time) != ''
+           AND (l.scheduled_date > ? OR
+             (l.scheduled_date = ? AND l.start_time >= ?))
            ${groupId == null ? '' : 'AND l.group_id = ?'}
          ORDER BY l.scheduled_date ASC, l.start_time ASC, l.id ASC''',
       groupId == null
           ? [dayStart, dayStart, nowTime]
           : [dayStart, dayStart, nowTime, groupId],
     );
-    return rows.map(LessonRecord.fromMap).toList();
+    return rows
+        .where(
+          (row) => _isValidTimeRange(
+            row['start_time'] as String?,
+            row['end_time'] as String?,
+          ),
+        )
+        .map(LessonRecord.fromMap)
+        .toList();
   }
 
   Future<int> generateUpcomingLessons(DateTime now) async {
@@ -100,7 +111,7 @@ class LessonLocalDataSource {
 
   Future<LessonRecord> getLesson(int lessonId) async {
     final rows = await dbHelper.db.rawQuery(
-      '''SELECT l.*, g.name AS group_name FROM lessons l
+      '''SELECT l.*, g.name AS group_name, g.target_grade AS group_grade FROM lessons l
          INNER JOIN groups g ON g.id = l.group_id WHERE l.id = ?''',
       [lessonId],
     );
