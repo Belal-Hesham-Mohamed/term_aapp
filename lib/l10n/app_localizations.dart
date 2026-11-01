@@ -122,6 +122,18 @@ abstract class AppLocalizations {
   /// **'Here\'s a quick overview of your daily activity.'**
   String get homeOverviewSubtitle;
 
+  /// No description provided for @homeSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Your overview'**
+  String get homeSummary;
+
+  /// No description provided for @homeRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get homeRetry;
+
   /// No description provided for @teacherNameFallback.
   ///
   /// In en, this message translates to:

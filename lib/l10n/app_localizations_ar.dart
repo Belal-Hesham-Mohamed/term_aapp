@@ -23,6 +23,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeOverviewSubtitle => 'إليك ملخصًا سريعًا لنشاطك اليومي.';
 
   @override
+  String get homeSummary => 'ملخصك';
+
+  @override
+  String get homeRetry => 'حاول مرة أخرى';
+
+  @override
   String get teacherNameFallback => 'المدرس';
 
   @override

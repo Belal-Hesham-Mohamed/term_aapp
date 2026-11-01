@@ -18,4 +18,22 @@ void main() {
     await tester.pumpWidget(const TermApp());
     expect(find.byType(MaterialApp), findsOneWidget);
   });
+
+  testWidgets('Home summary is readable on a narrow Arabic layout', (
+    WidgetTester tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(320, 720));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    getIt.registerFactory<HomeCubit>(
+      () => HomeCubit(const EmptyHomeRepository()),
+    );
+
+    await tester.pumpWidget(const TermApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('ملخصك'), findsOneWidget);
+    expect(find.text('دروس اليوم'), findsOneWidget);
+    expect(find.text('إجمالي المجموعات'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

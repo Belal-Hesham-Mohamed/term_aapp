@@ -5,6 +5,8 @@
   "welcomeBack": "Welcome back, {teacherName}!",
   "@welcomeBack": {"placeholders": {"teacherName": {}}},
   "homeOverviewSubtitle": "Here's a quick overview of your daily activity.",
+  "homeSummary": "Your overview",
+  "homeRetry": "Try again",
   "teacherNameFallback": "Teacher",
   "todaysLessons": "Today's Lessons",
   "noLessonsToday": "No lessons are scheduled for today.",

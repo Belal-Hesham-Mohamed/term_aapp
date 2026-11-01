@@ -5,6 +5,8 @@
   "welcomeBack": "مرحبًا بعودتك، {teacherName}!",
   "@welcomeBack": {"placeholders": {"teacherName": {}}},
   "homeOverviewSubtitle": "إليك ملخصًا سريعًا لنشاطك اليومي.",
+  "homeSummary": "ملخصك",
+  "homeRetry": "حاول مرة أخرى",
   "teacherNameFallback": "المدرس",
   "todaysLessons": "دروس اليوم",
   "noLessonsToday": "لا توجد دروس مجدولة اليوم.",

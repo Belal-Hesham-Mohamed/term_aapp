@@ -24,6 +24,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Here\'s a quick overview of your daily activity.';
 
   @override
+  String get homeSummary => 'Your overview';
+
+  @override
+  String get homeRetry => 'Try again';
+
+  @override
   String get teacherNameFallback => 'Teacher';
 
   @override
