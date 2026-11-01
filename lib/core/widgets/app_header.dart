@@ -82,3 +82,40 @@ class AppPageHeader extends StatelessWidget {
     );
   }
 }
+
+class AppHeaderContainer extends StatelessWidget {
+  final String title;
+  final IconData titleIcon;
+  final String? subtitle;
+  final VoidCallback? onNotificationTap;
+
+  const AppHeaderContainer({
+    super.key,
+    required this.title,
+    required this.titleIcon,
+    this.subtitle,
+    this.onNotificationTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: EdgeInsets.only(top: topPadding + 10, left: 16, right: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AppBrandHeader(
+              subtitle: subtitle,
+              onNotificationTap: onNotificationTap,
+            ),
+            const SizedBox(height: 16),
+            AppPageHeader(title: title, titleIcon: titleIcon),
+          ],
+        ),
+      ),
+    );
+  }
+}

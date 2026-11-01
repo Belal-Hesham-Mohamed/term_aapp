@@ -71,11 +71,10 @@ class _GroupsViewState extends State<_GroupsView> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Column(
-              children: [
-                AppBrandHeader(onNotificationTap: () {}),
-                AppPageHeader(title: l10n.groups, titleIcon: Icons.group_work),
-              ],
+            child: AppHeaderContainer(
+              title: l10n.groups,
+              titleIcon: Icons.group_work,
+              onNotificationTap: () {},
             ),
           ),
           Padding(

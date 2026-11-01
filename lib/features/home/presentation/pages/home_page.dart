@@ -49,9 +49,12 @@ class _HomeContent extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(AppSpacing.md),
               children: [
-                AppBrandHeader(subtitle: null, onNotificationTap: () {}),
-                const SizedBox(height: AppSpacing.sm),
-                AppPageHeader(title: l10n.home, titleIcon: Icons.home_outlined),
+                AppHeaderContainer(
+                  title: l10n.home,
+                  titleIcon: Icons.home_outlined,
+                  subtitle: null,
+                  onNotificationTap: () {},
+                ),
                 const SizedBox(height: AppSpacing.lg),
                 HomeWelcomeCard(
                   greeting: l10n.welcomeBack(

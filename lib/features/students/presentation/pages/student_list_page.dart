@@ -26,14 +26,10 @@ class StudentListPage extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: Column(
-                children: [
-                  AppBrandHeader(onNotificationTap: () {}),
-                  AppPageHeader(
-                    title: l10n.students,
-                    titleIcon: Icons.people_outline,
-                  ),
-                ],
+              child: AppHeaderContainer(
+                title: l10n.students,
+                titleIcon: Icons.people_outline,
+                onNotificationTap: () {},
               ),
             ),
             Expanded(child: const _StudentListBody()),
