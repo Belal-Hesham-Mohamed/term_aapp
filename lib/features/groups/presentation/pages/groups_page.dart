@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/widgets/app_header.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/study_group.dart';
 import '../../domain/entities/group_setup_outcome.dart';
@@ -62,19 +63,21 @@ class _GroupsViewState extends State<_GroupsView> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        elevation: 0,
-        title: Text(l10n.groups),
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openForm(),
         child: const Icon(Icons.add),
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Column(
+              children: [
+                AppBrandHeader(onNotificationTap: () {}),
+                AppPageHeader(title: l10n.groups, titleIcon: Icons.group_work),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(8),
             child: TextField(

@@ -9,6 +9,7 @@ import '../cubit/home_cubit.dart';
 import '../state/home_state.dart';
 import '../widgets/home_lesson_card.dart';
 import '../widgets/home_statistic_card.dart';
+import '../widgets/home_welcome_card.dart';
 import '../../../../core/widgets/app_header.dart';
 
 class HomePage extends StatelessWidget {
@@ -48,15 +49,17 @@ class _HomeContent extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(AppSpacing.md),
               children: [
-                AppHeader(
-                  title: l10n.home,
-                  titleIcon: Icons.home_outlined,
-                  subtitle: l10n.welcomeBack(
+                AppBrandHeader(subtitle: null, onNotificationTap: () {}),
+                const SizedBox(height: AppSpacing.sm),
+                AppPageHeader(title: l10n.home, titleIcon: Icons.home_outlined),
+                const SizedBox(height: AppSpacing.lg),
+                HomeWelcomeCard(
+                  greeting: l10n.welcomeBack(
                     summary.teacherName ?? l10n.teacherNameFallback,
                   ),
-                  onNotificationTap: () {},
+                  subtitle: l10n.homeOverviewSubtitle,
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.xl),
                 _SectionHeading(
                   title: l10n.todaysLessons,
                   icon: Icons.today_outlined,
