@@ -4,6 +4,7 @@ import '../../features/students/presentation/pages/student_list_page.dart';
 import '../../features/groups/presentation/pages/groups_page.dart';
 import '../../features/lessons/presentation/pages/lessons_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../core/widgets/app_background.dart';
 import '../../l10n/app_localizations.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -48,7 +49,8 @@ class _MainNavigationState extends State<MainNavigation> {
     ];
 
     return Scaffold(
-      body: _pages[_currentIndex],
+      backgroundColor: Colors.transparent,
+      body: AppBackground(child: _pages[_currentIndex]),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,

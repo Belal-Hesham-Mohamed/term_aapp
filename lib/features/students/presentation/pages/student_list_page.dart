@@ -9,6 +9,7 @@ import '../../../../l10n/app_localizations.dart';
 import 'student_form_page.dart';
 import '../student_labels.dart';
 import '../../domain/student_rules.dart';
+import '../../../../core/widgets/app_header.dart';
 
 class StudentListPage extends StatelessWidget {
   const StudentListPage({super.key});
@@ -19,7 +20,21 @@ class StudentListPage extends StatelessWidget {
     return BlocProvider<StudentCubit>(
       create: (_) => getIt<StudentCubit>(),
       child: Scaffold(
-        appBar: AppBar(title: Text(l10n.students)),
+        backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: AppHeader(
+                title: l10n.students,
+                titleIcon: Icons.people_outline,
+                onNotificationTap: () {},
+              ),
+            ),
+            Expanded(child: const _StudentListBody()),
+          ],
+        ),
         floatingActionButton: Builder(
           builder: (context) => FloatingActionButton(
             onPressed: () async {
@@ -34,7 +49,6 @@ class StudentListPage extends StatelessWidget {
             child: const Icon(Icons.add),
           ),
         ),
-        body: const _StudentListBody(),
       ),
     );
   }
@@ -51,7 +65,6 @@ class _StudentListBodyState extends State<_StudentListBody> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
   String? _selectedGrade;
-  final Set<int> _deletingStudentIds = {};
 
   @override
   void dispose() {
@@ -127,70 +140,44 @@ class _StudentListBodyState extends State<_StudentListBody> {
                       },
                       trailing: IconButton(
                         tooltip: l10n.deleteStudent,
-                        icon: _deletingStudentIds.contains(student.id)
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text(l10n.deleteStudent),
+                              content: Text(
+                                l10n.deleteStudentConfirm(student.displayName),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: Text(l10n.cancel),
                                 ),
-                              )
-                            : const Icon(Icons.delete_outline),
-                        onPressed: _deletingStudentIds.contains(student.id)
-                            ? null
-                            : () async {
-                                final confirm = await showDialog<bool>(
-                                  context: context,
-                                  builder: (ctx) => AlertDialog(
-                                    title: Text(l10n.deleteStudent),
-                                    content: Text(
-                                      l10n.deleteStudentConfirm(
-                                        student.displayName,
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(ctx, false),
-                                        child: Text(l10n.cancel),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(ctx, true),
-                                        child: Text(l10n.delete),
-                                      ),
-                                    ],
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: Text(l10n.delete),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true && context.mounted) {
+                            final deleted = await context
+                                .read<StudentCubit>()
+                                .deleteStudent(student.id);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    deleted
+                                        ? l10n.studentDeleted
+                                        : l10n.studentDeleteFailed,
                                   ),
-                                );
-                                if (confirm == true && context.mounted) {
-                                  setState(
-                                    () => _deletingStudentIds.add(student.id),
-                                  );
-                                  final deleted = await context
-                                      .read<StudentCubit>()
-                                      .deleteStudent(student.id);
-                                  if (context.mounted) {
-                                    setState(
-                                      () => _deletingStudentIds.remove(
-                                        student.id,
-                                      ),
-                                    );
-                                  }
-                                  if (deleted && context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(l10n.studentDeleted),
-                                      ),
-                                    );
-                                  } else if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(l10n.studentDeleteFailed),
-                                      ),
-                                    );
-                                  }
-                                }
-                              },
+                                ),
+                              );
+                            }
+                          }
+                        },
                       ),
                     );
                   },

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/widgets/app_header.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/lesson_record.dart';
 import '../../domain/entities/lesson_filter.dart';
@@ -76,9 +77,8 @@ class _LessonsListState extends State<_LessonsList> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.groupId == null ? l10n.lessons : l10n.groupLessons),
-      ),
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       floatingActionButton: FloatingActionButton(
         tooltip: l10n.addExceptionalLesson,
         onPressed: () => _create(context),
@@ -102,6 +102,14 @@ class _LessonsListState extends State<_LessonsList> {
           if (widget.groupId == null) {
             return Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: AppHeader(
+                    title: l10n.lessons,
+                    titleIcon: Icons.event_note_outlined,
+                    onNotificationTap: () {},
+                  ),
+                ),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(

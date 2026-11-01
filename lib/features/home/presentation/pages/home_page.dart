@@ -9,7 +9,7 @@ import '../cubit/home_cubit.dart';
 import '../state/home_state.dart';
 import '../widgets/home_lesson_card.dart';
 import '../widgets/home_statistic_card.dart';
-import '../widgets/home_welcome_card.dart';
+import '../../../../core/widgets/app_header.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -28,7 +28,8 @@ class _HomeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.home)),
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
           if (state is HomeInitial || state is HomeLoading) {
@@ -47,13 +48,15 @@ class _HomeContent extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(AppSpacing.md),
               children: [
-                HomeWelcomeCard(
-                  greeting: l10n.welcomeBack(
+                AppHeader(
+                  title: l10n.home,
+                  titleIcon: Icons.home_outlined,
+                  subtitle: l10n.welcomeBack(
                     summary.teacherName ?? l10n.teacherNameFallback,
                   ),
-                  subtitle: l10n.homeOverviewSubtitle,
+                  onNotificationTap: () {},
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.lg),
                 _SectionHeading(
                   title: l10n.todaysLessons,
                   icon: Icons.today_outlined,
